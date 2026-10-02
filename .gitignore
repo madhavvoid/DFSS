@@ -3,6 +3,16 @@
 .env.*
 !.env.example
 
+# Local package-manager credentials
+.npmrc
+!.npmrc.example
+
+# Private keys and local certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
 # Python
 __pycache__/
 *.py[cod]
@@ -11,10 +21,15 @@ venv/
 
 # Node.js
 node_modules/
-storage_node/data/
+Backend/storage_node/data/
 dist/
 build/
+coverage/
+tmp/
+temp/
+*.log
 npm-debug.log*
+*.tsbuildinfo
 
 # Editor and operating system files
 .vscode/

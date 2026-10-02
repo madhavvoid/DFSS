@@ -11,7 +11,7 @@ Requirements: Node.js 20.12 or newer and MongoDB running locally or remotely.
 3. Start the coordinator with `npm start`.
 4. In another terminal in this directory, start three local storage nodes with `npm run start:nodes`.
 
-The coordinator listens on `http://localhost:4000`; storage nodes use ports 8101-8103. Set `NODE_COUNT` to run a different number of nodes. `storage_node/data/` contains local chunk data and is excluded from Git.
+The coordinator listens on `http://localhost:4000`; storage nodes use ports 8101-8103. Set `NODE_COUNT` to run a different number of nodes. `../storage_node/data/` contains local chunk data and is excluded from Git.
 
 ## API
 
