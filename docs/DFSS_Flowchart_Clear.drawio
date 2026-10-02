@@ -1,0 +1,148 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="DFSS-FLOW-CLEAR" name="DFSS Flowchart - Clear">
+    <mxGraphModel dx="3000" dy="1124" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;" value="DISTRIBUTED FILE STORAGE SYSTEM (DFSS) - FLOWCHART" vertex="1">
+          <mxGeometry height="40" width="700" x="450" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="start" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;fontColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontStyle=1;fontSize=14;" value="START" vertex="1">
+          <mxGeometry height="55" width="180" x="700" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="login" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#ffffff;fontColor=#000000;strokeColor=#000000;strokeWidth=2;fontSize=14;" value="USER LOGIN" vertex="1">
+          <mxGeometry height="60" width="220" x="680" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="auth" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;fontColor=#000000;strokeColor=#000000;strokeWidth=2;fontStyle=1;fontSize=14;" value="VALID LOGIN?" vertex="1">
+          <mxGeometry height="90" width="180" x="700" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="dashboard" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#ffffff;fontColor=#000000;strokeColor=#000000;strokeWidth=2;fontSize=14;" value="USER DASHBOARD" vertex="1">
+          <mxGeometry height="60" width="220" x="680" y="375" as="geometry" />
+        </mxCell>
+        <mxCell id="operation" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;fontColor=#000000;strokeColor=#000000;strokeWidth=2;fontStyle=1;fontSize=14;" value="CHOOSE OPERATION" vertex="1">
+          <mxGeometry height="100" width="200" x="690" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="uploadLabel" parent="1" style="text;html=1;fontSize=18;fontStyle=1;align=center;" value="UPLOAD FILE" vertex="1">
+          <mxGeometry height="35" width="230" x="115" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="select" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="SELECT FILE" vertex="1">
+          <mxGeometry height="55" width="260" x="100" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="info" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="READ FILE INFORMATION" vertex="1">
+          <mxGeometry height="55" width="260" x="100" y="615" as="geometry" />
+        </mxCell>
+        <mxCell id="split" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="DIVIDE FILE INTO CHUNKS" vertex="1">
+          <mxGeometry height="55" width="260" x="100" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="metadata" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="CREATE / UPDATE FILE METADATA" vertex="1">
+          <mxGeometry height="55" width="260" x="100" y="785" as="geometry" />
+        </mxCell>
+        <mxCell id="node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="SELECT AVAILABLE STORAGE NODE" vertex="1">
+          <mxGeometry height="55" width="260" x="100" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="store" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="STORE CHUNKS ON NODE" vertex="1">
+          <mxGeometry height="55" width="260" x="100" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="downloadLabel" parent="1" style="text;html=1;fontSize=18;fontStyle=1;align=center;" value="DOWNLOAD FILE" vertex="1">
+          <mxGeometry height="35" width="230" x="1230" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="PsG41Q11g585S6ZKxm5f-2" edge="1" parent="1" source="selectD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="metaD" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="selectD" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="SELECT FILE TO DOWNLOAD" vertex="1">
+          <mxGeometry height="55" width="260" x="1220" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="metaD" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="RETRIEVE FILE METADATA" vertex="1">
+          <mxGeometry height="55" width="260" x="1220" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="PsG41Q11g585S6ZKxm5f-3" edge="1" parent="1" source="findD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="retrieveD" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="findD" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="LOCATE FILE CHUNKS" vertex="1">
+          <mxGeometry height="55" width="260" x="1220" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="retrieveD" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="RETRIEVE CHUNKS FROM STORAGE NODES" vertex="1">
+          <mxGeometry height="55" width="260" x="1220" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="allD" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontStyle=1;fontSize=13;" value="ALL CHUNKS RETRIEVED?" vertex="1">
+          <mxGeometry height="90" width="200" x="1250" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="reassemble" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="REASSEMBLE FILE" vertex="1">
+          <mxGeometry height="55" width="260" x="1220" y="945" as="geometry" />
+        </mxCell>
+        <mxCell id="success" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;fontColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontStyle=1;fontSize=13;" value="UPLOAD COMPLETE" vertex="1">
+          <mxGeometry height="55" width="210" x="450" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="logout" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontSize=13;" value="LOGOUT" vertex="1">
+          <mxGeometry height="55" width="200" x="690" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="end" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;fontColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontStyle=1;fontSize=14;" value="END" vertex="1">
+          <mxGeometry height="55" width="140" x="720" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="start" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="login" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="auth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="dashboard" value="YES">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="auth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="login" value="NO">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="dashboard" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="operation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u1" edge="1" parent="1" source="operation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="select" value="UPLOAD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u2" edge="1" parent="1" source="select" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="info">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u3" edge="1" parent="1" source="info" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="split">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u4" edge="1" parent="1" source="split" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="metadata">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u5" edge="1" parent="1" source="metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="node">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u6" edge="1" parent="1" source="node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="store">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="u7" edge="1" parent="1" source="store" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="success">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" edge="1" parent="1" source="operation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="selectD" value="DOWNLOAD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" edge="1" parent="1" source="selectD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="metaD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" edge="1" parent="1" source="metaD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="findD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" edge="1" parent="1" source="findD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="retrieveD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d5" edge="1" parent="1" source="retrieveD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="allD">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d6" edge="1" parent="1" source="allD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="reassemble" value="YES">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="d7" edge="1" parent="1" source="allD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="retrieveD" value="NO - RETRY">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l1" edge="1" parent="1" source="operation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="logout" value="LOGOUT">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l2" edge="1" parent="1" source="logout" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#000000;strokeWidth=2;" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

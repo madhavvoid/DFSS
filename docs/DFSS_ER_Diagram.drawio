@@ -1,0 +1,172 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="dfss-er" name="DFSS ER Diagram">
+    <mxGraphModel dx="1500" dy="562" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="user" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0b4f81;fontColor=#ffffff;strokeColor=#0b4f81;fontStyle=1;" value="USER" vertex="1">
+          <mxGeometry height="45" width="100" x="100" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="user_id" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="User_ID" vertex="1">
+          <mxGeometry height="45" width="100" x="20" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="user_name" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Name" vertex="1">
+          <mxGeometry height="45" width="100" x="110" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="user_email" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Email" vertex="1">
+          <mxGeometry height="45" width="100" x="215" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="user_pass" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Password" vertex="1">
+          <mxGeometry height="45" width="100" x="215" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="file" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0b4f81;fontColor=#ffffff;strokeColor=#0b4f81;fontStyle=1;" value="FILE" vertex="1">
+          <mxGeometry height="45" width="100" x="410" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="file_id" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="File_ID" vertex="1">
+          <mxGeometry height="45" width="100" x="355" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="file_name" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="File_Name" vertex="1">
+          <mxGeometry height="45" width="100" x="470" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="file_type" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="File_Type" vertex="1">
+          <mxGeometry height="45" width="100" x="575" y="215" as="geometry" />
+        </mxCell>
+        <mxCell id="file_size" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="File_Size" vertex="1">
+          <mxGeometry height="45" width="100" x="510" y="345" as="geometry" />
+        </mxCell>
+        <mxCell id="file_date" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Upload_Date" vertex="1">
+          <mxGeometry height="45" width="100" x="410" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="uploads" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#a98f7d;fontColor=#ffffff;strokeColor=#a98f7d;fontStyle=1;" value="Uploads" vertex="1">
+          <mxGeometry height="55" width="100" x="270" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="chunk" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0b4f81;fontColor=#ffffff;strokeColor=#0b4f81;fontStyle=1;" value="FILE_CHUNK" vertex="1">
+          <mxGeometry height="45" width="120" x="710" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="chunk_id" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Chunk_ID" vertex="1">
+          <mxGeometry height="45" width="100" x="665" y="555" as="geometry" />
+        </mxCell>
+        <mxCell id="chunk_no" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Chunk_Number" vertex="1">
+          <mxGeometry height="45" width="110" x="770" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="chunk_size" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Chunk_Size" vertex="1">
+          <mxGeometry height="45" width="105" x="870" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="divided" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#a98f7d;fontColor=#ffffff;strokeColor=#a98f7d;fontStyle=1;" value="Divided Into" vertex="1">
+          <mxGeometry height="55" width="105" x="570" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="node" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0b4f81;fontColor=#ffffff;strokeColor=#0b4f81;fontStyle=1;" value="STORAGE_NODE" vertex="1">
+          <mxGeometry height="45" width="125" x="990" y="283" as="geometry" />
+        </mxCell>
+        <mxCell id="node_id" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Node_ID" vertex="1">
+          <mxGeometry height="45" width="100" x="890" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="node_name" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Node_Name" vertex="1">
+          <mxGeometry height="45" width="105" x="950" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="node_ip" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="IP_Address" vertex="1">
+          <mxGeometry height="45" width="105" x="1055" y="215" as="geometry" />
+        </mxCell>
+        <mxCell id="node_capacity" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Capacity" vertex="1">
+          <mxGeometry height="45" width="100" x="1060" y="365" as="geometry" />
+        </mxCell>
+        <mxCell id="node_status" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;fontColor=#ffffff;strokeColor=#6b8fc7;" value="Status" vertex="1">
+          <mxGeometry height="45" width="100" x="935" y="365" as="geometry" />
+        </mxCell>
+        <mxCell id="stored" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#a98f7d;fontColor=#ffffff;strokeColor=#a98f7d;fontStyle=1;" value="Stored On" vertex="1">
+          <mxGeometry height="55" width="100" x="850" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" target="uploads">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="uploads" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" target="file">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="file" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" target="divided">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="divided" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" target="chunk">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="chunk" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="stored">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="760" y="460" as="sourcePoint" />
+            <mxPoint x="805" y="307.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="stored" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;" target="node">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" edge="1" parent="1" source="user" target="user_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" edge="1" parent="1" source="user" target="user_name">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" edge="1" parent="1" source="user" target="user_email">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" edge="1" parent="1" source="user" target="user_pass">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a5" edge="1" parent="1" source="file" target="file_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a6" edge="1" parent="1" source="file" target="file_name">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a7" edge="1" parent="1" source="file" target="file_type">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a8" edge="1" parent="1" source="file" target="file_size">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a9" edge="1" parent="1" source="file" target="file_date">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a10" edge="1" parent="1" source="chunk" target="chunk_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a11" edge="1" parent="1" source="chunk" target="chunk_no">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a12" edge="1" parent="1" source="chunk" target="chunk_size">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a13" edge="1" parent="1" source="node" target="node_id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a14" edge="1" parent="1" source="node" target="node_name">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a15" edge="1" parent="1" source="node" target="node_ip">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a16" edge="1" parent="1" source="node" target="node_capacity">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a17" edge="1" parent="1" source="node" target="node_status">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="text;html=1;fontStyle=1;fontSize=13;" value="LEGEND" vertex="1">
+          <mxGeometry height="25" width="90" x="45" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_entity" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0b4f81;fontColor=#ffffff;" value="Entity" vertex="1">
+          <mxGeometry height="30" width="75" x="45" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_attr" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6b8fc7;strokeColor=#6b8fc7;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="45" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_attr_text" parent="1" style="text;html=1;align=left;" value="Attribute" vertex="1">
+          <mxGeometry height="30" width="80" x="82" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_rel" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#a98f7d;strokeColor=#a98f7d;" value="" vertex="1">
+          <mxGeometry height="30" width="40" x="45" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_rel_text" parent="1" style="text;html=1;align=left;" value="Relationship" vertex="1">
+          <mxGeometry height="30" width="100" x="92" y="610" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
