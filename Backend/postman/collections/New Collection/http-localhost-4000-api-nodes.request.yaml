@@ -1,0 +1,10 @@
+$kind: http-request
+name: http://localhost:4000/api/nodes
+description: ""
+url: http://localhost:4000/api/nodes
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_0y1v}}"
+order: 814518282841208

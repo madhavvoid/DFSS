@@ -1,0 +1,15 @@
+$kind: http-request
+name: http://localhost:4000/api/auth/login
+description: ""
+url: http://localhost:4000/api/auth/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"madhavn_bhandari@srmus.edu.in\",\r
+
+    \    \"password\": \"bhndari@2026\"\r
+
+    }"
+order: 3832032767896109
