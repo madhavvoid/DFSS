@@ -1,16 +1,7 @@
-import Navbar from "./Components/Navbar";
+import WorkspacePage from "./Components/WorkspacePage";
 
 function App() {
-  return (
-    <>
-      <Navbar />
-
-      <main id="home">
-        <h1>Distributed File Storage System</h1>
-        <p>Securely store, manage, and access your files.</p>
-      </main>
-    </>
-  );
+  return <WorkspacePage />;
 }
 
 export default App;
