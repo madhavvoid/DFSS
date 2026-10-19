@@ -1,7 +1,7 @@
 import EntryIcon from "./EntryIcon";
 import { formatBytes, formatDate, isFolder } from "../utils/fileUtils";
 
-function FileList({ entries, loading, search, activeView, isGoogle, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
+function FileList({ entries, loading, search, activeView, isGoogle, isBackend, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
   return (
     <>
       {error && <div className="notice notice-error" role="alert"><span>{error}</span><button type="button" onClick={onDismissError} aria-label="Dismiss error">×</button></div>}
@@ -35,12 +35,12 @@ function FileList({ entries, loading, search, activeView, isGoogle, busy, layout
           <div className="empty-state" onDragOver={(event) => event.preventDefault()} onDrop={onDrop}>
             <div className="empty-illustration" aria-hidden="true"><span /><span /><span /></div>
             <h2>{search ? "No matching files" : activeView === "recent" ? "Nothing new in your archive." : "Your vault is ready."}</h2>
-            <p>{search ? "Try another name or clear the search." : isGoogle ? "Add a file to this connected storage location." : "Drop a file here or add your first item to TPCM Vault."}</p>
+            <p>{search ? "Try another name or clear the search." : isBackend ? "Upload a file and TPCM will distribute its chunks across healthy storage nodes." : isGoogle ? "Add a file to this connected storage location." : "Drop a file here or add your first item to TPCM."}</p>
             {!search && <button className="empty-upload" type="button" onClick={onUpload} disabled={busy}>Choose files <span aria-hidden="true">↑</span></button>}
           </div>
         )}
       </section>
-      <div className="workspace-footnote"><span className="footnote-dot" /> {isGoogle ? "Files are saved to your Google Drive account." : "Browser storage stays on this device and is not uploaded to a server."}</div>
+      <div className="workspace-footnote"><span className="footnote-dot" /> {isBackend ? "Files are chunked and replicated across available DFSS storage nodes." : isGoogle ? "Files are saved to your Google Drive account." : "Browser storage stays on this device and is not uploaded to a server."}</div>
     </>
   );
 }

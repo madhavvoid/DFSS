@@ -1,16 +1,21 @@
-function DriveHeader({ search, onSearch, profile, onDisconnect, onOpenAuth }) {
+function DriveHeader({ search, onSearch, profile, account, onSignOut, onDisconnect, onOpenAuth }) {
   return (
     <header className="app-header">
-      <a className="app-brand" href="#my-drive" aria-label="TPCM Vault home">
+      <a className="app-brand" href="#my-drive" aria-label="TPCM home">
         <img className="brand-mark" src="/tpcm-vault-mark.svg" alt="" />
-        <span className="brand-wordmark"><strong>TPCM</strong><small>VAULT</small></span>
+        <span className="brand-wordmark"><strong>TPCM</strong><small>Distributed Storage</small></span>
       </a>
       <label className="global-search">
         <span aria-hidden="true">⌕</span>
         <input aria-label="Search files in this folder" placeholder="Search your vault" value={search} onChange={(event) => onSearch(event.target.value)} />
       </label>
       <div className="header-account">
-        {profile ? (
+        {account ? (
+          <>
+            <span className="account-email">{account.email || account.phone}</span>
+            <button className="header-login" type="button" onClick={onSignOut}>Sign out</button>
+          </>
+        ) : profile ? (
           <>
             <span className="account-email">{profile.email}</span>
             <button className="account-avatar" type="button" title="Use browser storage" onClick={onDisconnect}>

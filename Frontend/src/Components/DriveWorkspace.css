@@ -412,6 +412,17 @@
 .empty-illustration span:nth-child(3) { background: #8ce0c3; }
 .workspace-footnote { color: #56627a; }
 
+.product-sidebar { gap: 15px; }
+.product-nav { display: grid; gap: 4px; }
+.product-nav button { min-height: 42px; padding: 0 10px; display: flex; align-items: center; gap: 11px; border: 0; color: #4b5770; text-align: left; background: transparent; font: 500 12px "Space Grotesk", sans-serif; cursor: pointer; }
+.product-nav button:hover { color: #273550; background: #e8ecf5; }
+.product-nav button.active { color: #354bbd; background: #e4e9f5; font-weight: 600; }
+.product-nav button:focus-visible { outline-offset: -2px; }
+.product-nav .nav-glyph { width: 18px; flex: none; color: #4c62df; font-size: 15px; text-align: center; }
+.nav-upload { margin-top: auto; }
+.nav-storage { padding: 12px 5px 2px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #d8deea; color: #65718a; font-size: 10px; }
+.nav-storage i { width: 7px; height: 7px; border-radius: 50%; background: #58a37f; }
+
 @media (max-width: 1050px) {
   .sidebar-bottom { flex-basis: 100%; justify-content: flex-end; padding-top: 9px; border-top: 1px solid #d9e0eb; }
 }
@@ -427,6 +438,11 @@
   .app-header { height: auto; min-height: 62px; padding: 10px 13px; grid-template-columns: auto 1fr; gap: 8px 12px; }
   .workspace-layout { min-height: calc(100vh - 110px); }
   .sidebar { min-height: auto; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 5px; border-bottom: 1px solid #dfe4ec; }
+  .sidebar.product-sidebar { padding: 8px 10px; display: block; overflow-x: auto; }
+  .product-nav { width: max-content; display: flex; gap: 3px; }
+  .product-nav button { min-height: 35px; padding: 0 9px; gap: 6px; font-size: 10px; white-space: nowrap; }
+  .product-nav .nav-glyph { width: auto; font-size: 12px; }
+  .product-sidebar .nav-upload, .product-sidebar .nav-storage { display: none; }
   .new-upload, .new-folder { height: 38px; margin: 0; font-size: 12px; }
   .sidebar-label, .sidebar-bottom { display: none; }
   .side-nav { flex: 1 0 100%; justify-content: flex-start; gap: 5px; }
