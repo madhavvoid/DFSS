@@ -35,5 +35,5 @@ The coordinator listens on `http://localhost:4000`; storage nodes use ports 8101
 The root `netlify.toml` configures Netlify to build `Frontend/` and publish its Vite output. Connect this GitHub repository to Netlify and deploy the desired branch. Browser-storage mode works without a backend; Google Drive requires `VITE_GOOGLE_CLIENT_ID` in the Netlify environment and the deployed site origin in the Google OAuth client.
 
 The Express coordinator and storage nodes are separate services and are not deployed by this Netlify configuration. To use backend authentication or distributed storage from the deployed frontend, host those services separately and set `VITE_API_BASE_URL` in Netlify to the coordinator's public origin (without a trailing slash). Configure the backend's CORS settings to allow the Netlify site origin.
-See [Backend/server/README.md](Backend/server/README.md) for API endpoints and [docs/dfss_dos.md](docs/dfss_dos.md) for the design notes. `.env`, `node_modules/`, and `Backend/storage_node/data/` are local/generated content and should not be committed.
 
+See [Backend/server/README.md](Backend/server/README.md) for API endpoints and [docs/dfss_dos.md](docs/dfss_dos.md) for the design notes. `.env`, `node_modules/`, and `Backend/storage_node/data/` are local/generated content and should not be committed.
