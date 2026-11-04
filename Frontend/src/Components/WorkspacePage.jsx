@@ -5,6 +5,8 @@ import DriveHeader from "./DriveHeader";
 import DriveSidebar from "./DriveSidebar";
 import FileList from "./FileList";
 import FolderDialog from "./FolderDialog";
+import AuthLandingPage from "./AuthLandingPage/AuthLandingPage";
+import AuthPage from "./AuthPage/AuthPage";
 import DashboardView from "./AppViews/DashboardView";
 import UploadView from "./AppViews/UploadView";
 import StorageNodesView from "./AppViews/StorageNodesView";
@@ -34,8 +36,19 @@ import "./DriveWorkspace.css";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function WorkspacePage() {
+<<<<<<< HEAD
+  const [authSession, setAuthSession] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem("dfss-auth-session") || "null");
+    } catch {
+      return null;
+    }
+  });
+  const [mode, setMode] = useState("backend");
+=======
   const savedDfssSession = readDfssAuth();
   const [mode, setMode] = useState(savedDfssSession.token ? "dfss" : "local");
+>>>>>>> 4f904a9 (changes risky)
   const [accessToken, setAccessToken] = useState("");
   const [dfssToken, setDfssToken] = useState(savedDfssSession.token ?? "");
   const [profile, setProfile] = useState(savedDfssSession.user ?? null);
@@ -43,6 +56,7 @@ function WorkspacePage() {
   const [entries, setEntries] = useState([]);
   const [dfssNodes, setDfssNodes] = useState([]);
   const [folderPath, setFolderPath] = useState([{ id: null, name: "Vault" }]);
+  const [activeSection, setActiveSection] = useState("dashboard");
   const [activeView, setActiveView] = useState("drive");
   const [activityItems, setActivityItems] = useState(() => {
     try {
@@ -60,7 +74,12 @@ function WorkspacePage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [authIntent, setAuthIntent] = useState("signin");
+<<<<<<< HEAD
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authPageOpen, setAuthPageOpen] = useState(false);
+=======
   const [authOpen, setAuthOpen] = useState(!(savedDfssSession.token || savedDfssSession.user));
+>>>>>>> 4f904a9 (changes risky)
   const [authError, setAuthError] = useState("");
   const [folderOpen, setFolderOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -68,18 +87,27 @@ function WorkspacePage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const uploadInput = useRef(null);
   const currentFolder = folderPath[folderPath.length - 1];
+  const activeToken = mode === "dfss" ? dfssToken : accessToken;
   const isGoogle = mode === "google";
-  const isDfss = mode === "dfss" || mode === "backend";
-  const activeToken = isDfss ? dfssToken : accessToken;
+<<<<<<< HEAD
+  const isBackend = mode === "backend";
+  const storageToken = isBackend ? authSession?.token : accessToken;
+=======
+  const isDfss = mode === "dfss";
+>>>>>>> 4f904a9 (changes risky)
 
   useEffect(() => {
     sessionStorage.setItem("dfss-activity-items", JSON.stringify(activityItems));
   }, [activityItems]);
 
   useEffect(() => {
+    if (!authSession) return undefined;
     let cancelled = false;
-    setLoading(true);
+<<<<<<< HEAD
+    listEntries(mode, storageToken, currentFolder.id)
+=======
     listEntries(mode, activeToken, currentFolder.id)
+>>>>>>> 4f904a9 (changes risky)
       .then((result) => {
         if (!cancelled) setEntries(result);
       })
@@ -90,10 +118,13 @@ function WorkspacePage() {
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
+<<<<<<< HEAD
+  }, [mode, storageToken, currentFolder.id, refreshKey, authSession]);
+=======
   }, [mode, activeToken, currentFolder.id, refreshKey]);
 
   useEffect(() => {
-    if (!isDfss || !dfssToken) {
+    if (mode !== "dfss" || !dfssToken) {
       return undefined;
     }
 
@@ -107,10 +138,10 @@ function WorkspacePage() {
       });
 
     return () => { cancelled = true; };
-  }, [isDfss, dfssToken, refreshKey]);
+  }, [mode, dfssToken, refreshKey]);
 
   useEffect(() => {
-    if (!dfssToken || !isDfss) return undefined;
+    if (!dfssToken || mode !== "dfss") return undefined;
 
     let cancelled = false;
     fetchDfssCurrentUser(dfssToken)
@@ -128,7 +159,8 @@ function WorkspacePage() {
       });
 
     return () => { cancelled = true; };
-  }, [dfssToken, isDfss]);
+  }, [dfssToken, mode]);
+>>>>>>> 4f904a9 (changes risky)
 
   useEffect(() => {
     if (!authOpen && !folderOpen && !deleteTarget) return undefined;
@@ -170,6 +202,15 @@ function WorkspacePage() {
     setAuthOpen(true);
   }
 
+  function recordActivity(type, name) {
+    setActivityItems((items) => [{
+      id: `${Date.now()}-${Math.random()}`,
+      type,
+      name,
+      at: new Date().toISOString(),
+    }, ...items].slice(0, 50));
+  }
+
   async function handleGoogleConnect() {
     if (!GOOGLE_CLIENT_ID) {
       setAuthError("Google Drive is not configured yet. Add VITE_GOOGLE_CLIENT_ID to Frontend/.env.local, or use the browser workspace for now.");
@@ -189,6 +230,7 @@ function WorkspacePage() {
       setFolderPath([{ id: null, name: "Vault" }]);
       setActiveView("drive");
       setAuthOpen(false);
+      recordActivity("Connected storage", "Google Drive");
       setNotice("Connected to Google Drive.");
     } catch (connectionError) {
       setAuthError(connectionError.message || "Could not connect to Google Drive.");
@@ -253,7 +295,12 @@ function WorkspacePage() {
     setError("");
     setNotice("");
     try {
+<<<<<<< HEAD
+      await uploadEntries(mode, storageToken, selectedFiles, currentFolder.id);
+      recordActivity("Uploaded", selectedFiles.map((file) => file.name).join(", "));
+=======
       await uploadEntries(mode, activeToken, selectedFiles, currentFolder.id);
+>>>>>>> 4f904a9 (changes risky)
       setNotice(`${selectedFiles.length} file${selectedFiles.length === 1 ? "" : "s"} added.`);
       refresh();
     } catch (uploadError) {
@@ -271,7 +318,12 @@ function WorkspacePage() {
     setBusy(true);
     setError("");
     try {
+<<<<<<< HEAD
+      await uploadEntries(mode, storageToken, droppedFiles, currentFolder.id);
+      recordActivity("Uploaded", droppedFiles.map((file) => file.name).join(", "));
+=======
       await uploadEntries(mode, activeToken, droppedFiles, currentFolder.id);
+>>>>>>> 4f904a9 (changes risky)
       setNotice(`${droppedFiles.length} file${droppedFiles.length === 1 ? "" : "s"} added.`);
       refresh();
     } catch (uploadError) {
@@ -288,7 +340,12 @@ function WorkspacePage() {
     setBusy(true);
     setError("");
     try {
+<<<<<<< HEAD
+      await createFolder(mode, storageToken, trimmedName, currentFolder.id);
+      recordActivity("Created folder", trimmedName);
+=======
       await createFolder(mode, activeToken, trimmedName, currentFolder.id);
+>>>>>>> 4f904a9 (changes risky)
       setFolderName("");
       setFolderOpen(false);
       setNotice(`Folder “${trimmedName}” created.`);
@@ -305,7 +362,12 @@ function WorkspacePage() {
     setBusy(true);
     setError("");
     try {
+<<<<<<< HEAD
+      await deleteEntry(mode, storageToken, deleteTarget);
+      recordActivity("Deleted", deleteTarget.name);
+=======
       await deleteEntry(mode, activeToken, deleteTarget);
+>>>>>>> 4f904a9 (changes risky)
       setNotice(`“${deleteTarget.name}” removed.`);
       setDeleteTarget(null);
       refresh();
@@ -325,7 +387,12 @@ function WorkspacePage() {
       return;
     }
     try {
+<<<<<<< HEAD
+      await downloadEntry(mode, storageToken, entry);
+      recordActivity("Downloaded", entry.name);
+=======
       await downloadEntry(mode, activeToken, entry);
+>>>>>>> 4f904a9 (changes risky)
     } catch (downloadError) {
       setError(downloadError.message || "Could not download this file.");
     }
@@ -343,8 +410,12 @@ function WorkspacePage() {
     setDfssToken("");
     clearDfssAuth();
     setProfile(null);
+<<<<<<< HEAD
+    setMode("backend");
+=======
     setMode("local");
     setIsAuthenticated(false);
+>>>>>>> 4f904a9 (changes risky)
     setLoading(true);
     setError("");
     setFolderPath([{ id: null, name: "Vault" }]);
@@ -357,6 +428,41 @@ function WorkspacePage() {
     setActiveView(view);
   }
 
+<<<<<<< HEAD
+  function selectSection(section) {
+    setActiveSection(section);
+    if (section === "files") setActiveView("drive");
+  }
+
+  function handleAuthenticated(session) {
+    sessionStorage.setItem("dfss-auth-session", JSON.stringify(session));
+    setAuthSession(session);
+    setMode("backend");
+    setAccessToken("");
+    setActiveSection("dashboard");
+    setActiveView("drive");
+    setLoading(true);
+    setError("");
+    setAuthPageOpen(false);
+  }
+
+  function signOut() {
+    sessionStorage.removeItem("dfss-auth-session");
+    sessionStorage.removeItem("dfss-activity-items");
+    setAuthSession(null);
+    setAuthPageOpen(false);
+    setMode("local");
+    setAccessToken("");
+    setProfile(null);
+  }
+
+  if (!authSession && authPageOpen) {
+    return <AuthPage initialIntent={authIntent} onAuthenticated={handleAuthenticated} onBack={() => setAuthPageOpen(false)} />;
+  }
+
+  if (!authSession) {
+    return <AuthLandingPage onOpenAuth={(intent) => { setAuthIntent(intent); setAuthPageOpen(true); }} />;
+=======
   if (!isAuthenticated) {
     return (
       <div className="drive-app">
@@ -371,26 +477,84 @@ function WorkspacePage() {
         />
       </div>
     );
+>>>>>>> 4f904a9 (changes risky)
   }
 
   return (
     <div className="drive-app">
+<<<<<<< HEAD
+      <DriveHeader search={search} onSearch={setSearch} profile={profile} account={authSession.user} onSignOut={signOut} onDisconnect={disconnectGoogle} onOpenAuth={openAuth} />
+=======
       <DriveHeader search={search} onSearch={setSearch} profile={profile} onDisconnect={disconnectCurrentStorage} onOpenAuth={openAuth} />
+>>>>>>> 4f904a9 (changes risky)
       <div className="workspace-layout">
         <DriveSidebar
           busy={busy}
-          activeView={activeView}
+          activeSection={activeSection}
           onUpload={() => uploadInput.current?.click()}
-          onCreateFolder={() => { setFolderName(""); setFolderOpen(true); }}
-          onSelectView={selectView}
+          onSelectSection={selectSection}
           folderSize={folderSize}
           fileCount={fileCount}
+<<<<<<< HEAD
+          isGoogle={isGoogle}
+          isBackend={isBackend}
+=======
           mode={mode}
+>>>>>>> 4f904a9 (changes risky)
           onConnect={() => openAuth("signin")}
           onConnectDfss={() => setAuthOpen(true)}
           onDisconnect={disconnectCurrentStorage}
         />
         <input ref={uploadInput} className="visually-hidden" type="file" multiple onChange={handleUpload} />
+<<<<<<< HEAD
+        <main className="file-main" onDragOver={(event) => event.preventDefault()} onDrop={activeSection === "files" ? handleDrop : undefined}>
+          {activeSection === "dashboard" && <DashboardView user={authSession.user} entries={entries} loading={loading} error={error} onDismissError={() => setError("")} activityItems={activityItems} isGoogle={isGoogle} isBackend={isBackend} onNavigate={selectSection} onUpload={() => selectSection("upload")} />}
+          {activeSection === "upload" && <UploadView busy={busy} isGoogle={isGoogle} isBackend={isBackend} onChooseFiles={() => uploadInput.current?.click()} onDrop={handleDrop} error={error} notice={notice} onDismissError={() => setError("")} onDismissNotice={() => setNotice("")} />}
+          {activeSection === "nodes" && <StorageNodesView token={authSession.token} />}
+          {activeSection === "activity" && <ActivityView items={activityItems} />}
+          {activeSection === "settings" && <SettingsView user={authSession.user} isGoogle={isGoogle} isBackend={isBackend} onConnect={() => openAuth("signin")} onDisconnect={disconnectGoogle} onSignOut={signOut} />}
+          {activeSection === "files" && (
+            <>
+              <div className="page-topline">
+                <div><div className="eyebrow">MY FILES <span>·</span> {isBackend ? "DISTRIBUTED STORAGE" : isGoogle ? "CONNECTED STORAGE" : "PERSONAL STORAGE"}</div><h1>{activeView === "recent" ? "Recently added" : currentFolder.name === "Vault" ? "Vault contents" : currentFolder.name}</h1></div>
+                <div className="main-actions">
+                  <button className="outline-action" type="button" onClick={() => selectView(activeView === "recent" ? "drive" : "recent")}>{activeView === "recent" ? "All files" : "Recently added"}</button>
+                  {!isBackend && <button className="outline-action" type="button" onClick={() => { setFolderName(""); setFolderOpen(true); }} disabled={busy}>New folder</button>}
+                  <button className="solid-action" type="button" onClick={() => uploadInput.current?.click()} disabled={busy}><span aria-hidden="true">↑</span> Upload files</button>
+                </div>
+              </div>
+              <div className="breadcrumbs" aria-label="Folder location">
+                {folderPath.map((folder, index) => (
+                  <span className="breadcrumb-part" key={`${folder.id || "root"}-${index}`}>
+                    {index > 0 && <span className="breadcrumb-separator" aria-hidden="true">/</span>}
+                    <button type="button" aria-current={index === folderPath.length - 1 ? "page" : undefined} onClick={() => navigateTo(index)}>{folder.name}</button>
+                  </span>
+                ))}
+                {activeView === "recent" && <span className="recent-note">LAST 30 DAYS</span>}
+              </div>
+              <FileList
+                entries={visibleEntries}
+                loading={loading}
+                search={search}
+                activeView={activeView}
+                isGoogle={isGoogle}
+                isBackend={isBackend}
+                busy={busy}
+                layout={layout}
+                sortKey={sortKey}
+                onSortChange={setSortKey}
+                onLayoutChange={setLayout}
+                onUpload={() => uploadInput.current?.click()}
+                onOpenEntry={handleOpenEntry}
+                onDeleteEntry={setDeleteTarget}
+                onDrop={handleDrop}
+                error={error}
+                notice={notice}
+                onDismissError={() => setError("")}
+                onDismissNotice={() => setNotice("")}
+              />
+            </>
+=======
         <main className="file-main" onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
           <section className="vault-banner">
             <div className="vault-intro-copy">
@@ -430,7 +594,8 @@ function WorkspacePage() {
             loading={loading}
             search={search}
             activeView={activeView}
-            mode={mode}
+            isGoogle={isGoogle}
+            isDfss={isDfss}
             busy={busy}
             layout={layout}
             sortKey={sortKey}
@@ -521,6 +686,7 @@ function WorkspacePage() {
                 </section>
               </div>
             </div>
+>>>>>>> 4f904a9 (changes risky)
           )}
         </main>
       </div>

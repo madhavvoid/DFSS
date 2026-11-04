@@ -1,11 +1,13 @@
 import EntryIcon from "./EntryIcon";
 import { formatBytes, formatDate, isFolder } from "../utils/fileUtils";
 
-function FileList({ entries, loading, search, activeView, mode, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
-  const isGoogle = mode === "google";
-  const isDfss = mode === "dfss" || mode === "backend";
+<<<<<<< HEAD
+function FileList({ entries, loading, search, activeView, isGoogle, isBackend, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
+=======
+function FileList({ entries, loading, search, activeView, isGoogle, isDfss, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
   const storageFootnote = isGoogle ? "Files are saved to your Google Drive account." : isDfss ? "Files are managed by the DFSS coordinator and stored on the current healthy storage nodes." : "Browser storage stays on this device and is not uploaded to a server.";
 
+>>>>>>> 4f904a9 (changes risky)
   return (
     <>
       {error && <div className="notice notice-error" role="alert"><span>{error}</span><button type="button" onClick={onDismissError} aria-label="Dismiss error">×</button></div>}
@@ -38,13 +40,22 @@ function FileList({ entries, loading, search, activeView, mode, busy, layout, so
         )) : (
           <div className="empty-state" onDragOver={(event) => event.preventDefault()} onDrop={onDrop}>
             <div className="empty-illustration" aria-hidden="true"><span /><span /><span /></div>
+<<<<<<< HEAD
+            <h2>{search ? "No matching files" : activeView === "recent" ? "Nothing new in your archive." : "Your vault is ready."}</h2>
+            <p>{search ? "Try another name or clear the search." : isBackend ? "Upload a file and TPCM will distribute its chunks across healthy storage nodes." : isGoogle ? "Add a file to this connected storage location." : "Drop a file here or add your first item to TPCM."}</p>
+=======
             <h2>{search ? "No matching files" : activeView === "recent" ? "Nothing new in your archive." : isDfss ? "No files are stored yet." : "Your vault is ready."}</h2>
             <p>{search ? "Try another name or clear the search." : isDfss ? "Upload a file to the DFSS coordinator to begin distributed storage." : isGoogle ? "Add a file to this connected storage location." : "Drop a file here or add your first item to TPCM Vault."}</p>
+>>>>>>> 4f904a9 (changes risky)
             {!search && <button className="empty-upload" type="button" onClick={onUpload} disabled={busy}>Choose files <span aria-hidden="true">↑</span></button>}
           </div>
         )}
       </section>
+<<<<<<< HEAD
+      <div className="workspace-footnote"><span className="footnote-dot" /> {isBackend ? "Files are chunked and replicated across available DFSS storage nodes." : isGoogle ? "Files are saved to your Google Drive account." : "Browser storage stays on this device and is not uploaded to a server."}</div>
+=======
       <div className="workspace-footnote"><span className="footnote-dot" /> {storageFootnote}</div>
+>>>>>>> 4f904a9 (changes risky)
     </>
   );
 }

@@ -12,7 +12,12 @@ function AuthDialog({ intent, busy, error, onConnectGoogle, onConnectDfss, onUse
         <button className="dialog-close" type="button" aria-label="Close" onClick={onClose}>×</button>
         <span className="dialog-kicker">TPCM / ACCOUNT</span>
         <h2 id="auth-title">{intent === "signup" ? "Make room for your files." : "Your files, in reach."}</h2>
+<<<<<<< HEAD
+        <p>Use your Google account to connect TPCM to Google Drive. Your files stay in your Drive.</p>
+=======
         <p>Choose how you want to store the archive. Google Drive uses your personal Google account; DFSS uses the coordinator API and distributed storage nodes.</p>
+
+>>>>>>> 4f904a9 (changes risky)
         <button className="google-action" type="button" onClick={onConnectGoogle} disabled={busy}><span className="google-g">G</span>{busy ? "Connecting…" : "Continue with Google"}<span className="google-arrow">↗</span></button>
 
         <div className="dfss-auth-panel">
