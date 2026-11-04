@@ -12,6 +12,7 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
   const [channel, setChannel] = useState("email");
   const [code, setCode] = useState("");
   const [destination, setDestination] = useState("");
+  const [developmentCode, setDevelopmentCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -59,6 +60,8 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
     try {
       const result = await requestEmailCode(requestDetails());
       setDestination(result.destination);
+      setDevelopmentCode(result.developmentCode ?? "");
+      setCode(result.developmentCode ?? "");
       setStep("code");
     } catch (requestError) {
       setError(requestError.message);
@@ -147,7 +150,14 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
             </>
           ) : (
             <>
-              <p className="auth-panel-copy">We sent a six-digit code by {channel === "sms" ? "text message" : "email"} to <strong>{destination}</strong>. Enter it below to {intent === "signup" ? "finish creating your account" : "sign in"}.</p>
+              <p className="auth-panel-copy">
+                {developmentCode ? (
+                  <>A local development code was generated for <strong>{destination}</strong>.</>
+                ) : (
+                  <>We sent a six-digit code by {channel === "sms" ? "text message" : "email"} to <strong>{destination}</strong>.</>
+                )} Enter it below to {intent === "signup" ? "finish creating your account" : "sign in"}.
+              </p>
+              {developmentCode && <p className="auth-development-code" role="status">Local development code: <strong>{developmentCode}</strong></p>}
               <form className="auth-form code-form" onSubmit={handleVerifyCode}>
                 <label htmlFor="auth-code">Verification code</label>
                 <input id="auth-code" className="auth-code-input" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength="6" placeholder="000000" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} required />

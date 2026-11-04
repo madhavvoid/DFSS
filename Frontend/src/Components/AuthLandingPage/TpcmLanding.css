@@ -18,7 +18,7 @@
 .tpcm-brand-mark svg { width: 32px; height: 32px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3.5; }
 .tpcm-brand-copy { display: grid; gap: 1px; }
 .tpcm-brand-copy strong { color: #17366e; font-size: 18px; font-weight: 800; line-height: 1; }
-.tpcm-brand-copy small { color: #536989; font-size: 9px; font-weight: 600; white-space: nowrap; }
+.tpcm-brand-copy small { max-width: 180px; color: #536989; font-size: 9px; font-weight: 600; }
 .tpcm-nav { height: 100%; display: flex; align-items: center; gap: clamp(15px, 2.1vw, 31px); }
 .tpcm-nav a { position: relative; height: 100%; display: inline-flex; align-items: center; color: #34486b; font-size: 11px; font-weight: 700; text-decoration: none; white-space: nowrap; }
 .tpcm-nav a:hover, .tpcm-nav a.is-current { color: var(--tpcm-blue); }
@@ -108,7 +108,7 @@
   .tpcm-brand-mark { width: 35px; height: 35px; }
   .tpcm-brand-mark svg { width: 28px; height: 28px; }
   .tpcm-brand-copy strong { font-size: 16px; }
-  .tpcm-brand-copy small { font-size: 7px; }
+  .tpcm-brand-copy small { max-width: 155px; font-size: 7px; }
   .tpcm-account-actions { gap: 6px; }
   .tpcm-login, .tpcm-register { min-width: 59px; min-height: 33px; padding: 0 10px; font-size: 10px; }
   .tpcm-nav { grid-column: 1 / -1; grid-row: 2; width: 100%; height: 39px; justify-content: flex-start; gap: 20px; overflow-x: auto; }

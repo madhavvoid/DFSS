@@ -4,7 +4,7 @@
 .brand-mark { width: 36px; height: 36px; display: block; }
 .brand-wordmark { display: grid; gap: 1px; }
 .brand-wordmark strong { color: #182036; font-family: "Space Grotesk", sans-serif; font-size: 17px; font-weight: 700; line-height: 1; }
-.brand-wordmark small { color: #65718a; font: 9px/1.2 "IBM Plex Mono", monospace; }
+.brand-wordmark small { max-width: 174px; color: #65718a; font: 9px/1.2 "IBM Plex Mono", monospace; }
 .brand-divider { color: #e39a63; }
 .global-search { width: min(100%, 620px); height: 38px; display: flex; align-items: center; gap: 11px; padding: 0 12px; border: 1px solid #e1e5df; background: #f7f8f5; color: #67716b; }
 .global-search > span { font-size: 20px; line-height: 1; }
@@ -234,7 +234,7 @@
   .app-brand { font-size: 16px; }
   .brand-mark { width: 32px; height: 32px; }
   .brand-wordmark strong { font-size: 14px; }
-  .brand-wordmark small { font-size: 8px; }
+  .brand-wordmark small { max-width: 125px; font-size: 8px; }
   .header-account { grid-column: 2; grid-row: 1; }
   .header-login, .header-signup { min-height: 34px; padding: 0 9px; font-size: 11px; }
   .global-search { grid-row: 2; grid-column: 1 / -1; width: 100%; height: 34px; }

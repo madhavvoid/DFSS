@@ -21,5 +21,6 @@ export function errorHandler(error, req, res, next) {
 
   const status = Number.isInteger(error.status) ? error.status : 500;
   if (status >= 500) console.error(error);
-  return res.status(status).json({ error: status >= 500 ? 'Internal server error' : error.message });
+  const isExpectedApiError = error instanceof ApiError;
+  return res.status(status).json({ error: status >= 500 && !isExpectedApiError ? 'Internal server error' : error.message });
 }

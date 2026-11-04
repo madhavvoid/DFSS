@@ -58,6 +58,8 @@
 .auth-submit span { color: var(--auth-lime); font-size: 16px; }
 .auth-privacy-note { margin: 15px 0 0; color: #78847a; font-size: 11px; line-height: 1.55; }
 .auth-page-error { margin: 3px 0; padding: 10px; color: #8b4033; background: #faebe6; font-size: 12px; line-height: 1.5; }
+.auth-development-code { margin: 0 0 12px; padding: 10px 12px; border-left: 3px solid #1769f7; color: #315a47; background: #eaf3ff; font-size: 12px; }
+.auth-development-code strong { margin-left: 5px; color: #142b57; font: 700 14px "IBM Plex Mono", monospace; }
 .auth-code-input { height: 56px !important; font: 500 24px "IBM Plex Mono", monospace !important; letter-spacing: 5px; text-align: center; }
 .auth-code-actions { margin-top: 13px; display: flex; justify-content: space-between; }
 .auth-code-actions button { padding: 5px 0; border: 0; color: var(--auth-green); background: transparent; font: 700 11px "Manrope", sans-serif; cursor: pointer; }

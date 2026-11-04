@@ -3,7 +3,7 @@ function DriveHeader({ search, onSearch, profile, account, onSignOut, onDisconne
     <header className="app-header">
       <a className="app-brand" href="#my-drive" aria-label="TPCM home">
         <img className="brand-mark" src="/tpcm-vault-mark.svg" alt="" />
-        <span className="brand-wordmark"><strong>TPCM</strong><small>Distributed Storage</small></span>
+        <span className="brand-wordmark"><strong>TPCM</strong><small>Trusted Platform for Cloud Management and Security</small></span>
       </a>
       <label className="global-search">
         <span aria-hidden="true">⌕</span>
