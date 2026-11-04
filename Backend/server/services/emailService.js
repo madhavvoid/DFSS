@@ -6,6 +6,9 @@ async function sendEmailCode(email, code) {
   if (!config.smtpHost || !config.smtpFrom) {
     throw new ApiError(503, 'Email verification is not configured. Contact the site administrator.');
   }
+  if (Boolean(config.smtpUser) !== Boolean(config.smtpPassword)) {
+    throw new ApiError(503, 'Configure both SMTP_USER and SMTP_PASSWORD to send verification emails.');
+  }
 
   const transporter = nodemailer.createTransport({
     host: config.smtpHost,

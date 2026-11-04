@@ -20,6 +20,10 @@ export function requestEmailCode(details) {
   return postAuth("request-code", details);
 }
 
+export function register(details) {
+  return postAuth("register", details);
+}
+
 export function verifyEmailCode(details) {
   return postAuth("verify-code", details);
 }

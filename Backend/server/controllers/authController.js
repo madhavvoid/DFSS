@@ -58,7 +58,7 @@ function signupDetails(body) {
   if (name.length < 1 || name.length > 100) throw new ApiError(400, 'Name must be between 1 and 100 characters');
   if (email && (!emailPattern.test(email) || email.length > 254)) throw new ApiError(400, 'Enter a valid email address');
   if (phone) validatePhone(phone);
-  if (!email && !phone) throw new ApiError(400, 'Enter an email address or phone number');
+  if (!email) throw new ApiError(400, 'Enter an email address to create an account');
   return { name, email: email || undefined, phone: phone || undefined };
 }
 
@@ -80,32 +80,17 @@ function publicUser(user) {
 export async function requestVerificationCode(req, res) {
   const intent = req.body.intent;
   const channel = verificationChannel(req.body.channel);
-  if (!['signup', 'signin'].includes(intent)) throw new ApiError(400, 'Choose sign in or sign up');
+  if (intent !== 'signin') throw new ApiError(400, 'Choose sign in');
 
-  let details;
   let email;
   let phone;
-  let key;
-  if (intent === 'signup') {
-    details = signupDetails(req.body);
-    email = details.email;
-    phone = details.phone;
-    if (channel === 'email' && !email) throw new ApiError(400, 'Enter an email address to receive your confirmation code');
-    if (channel === 'sms' && !phone) throw new ApiError(400, 'Enter a phone number to receive your confirmation code');
-    const existingContacts = [email && { email }, phone && { phone }].filter(Boolean);
-    if (await User.exists({ $or: existingContacts })) {
-      throw new ApiError(409, 'An account with this email or phone number already exists');
-    }
-    key = accountKey(details);
-  } else {
-    const identifier = typeof req.body.identifier === 'string' ? req.body.identifier.trim() : '';
-    if (!identifier) throw new ApiError(400, 'Enter your email address or phone number');
-    const user = await findUserByIdentifier(identifier.includes('@') ? normalizeEmail(identifier) : normalizePhone(identifier));
-    if (!user) throw new ApiError(404, 'No account was found for that email or phone number');
-    email = user.email;
-    phone = user.phone;
-    key = accountKey(user);
-  }
+  const identifier = typeof req.body.identifier === 'string' ? req.body.identifier.trim() : '';
+  if (!identifier) throw new ApiError(400, 'Enter your email address or phone number');
+  const user = await findUserByIdentifier(identifier.includes('@') ? normalizeEmail(identifier) : normalizePhone(identifier));
+  if (!user) throw new ApiError(404, 'No account was found for that email or phone number');
+  email = user.email;
+  phone = user.phone;
+  const key = accountKey(user);
 
   if (channel === 'sms' && !phone) throw new ApiError(400, 'This account does not have a phone number for SMS confirmation');
   if (channel === 'email' && !email) throw new ApiError(400, 'This account does not have an email address for email confirmation');
@@ -119,11 +104,12 @@ export async function requestVerificationCode(req, res) {
   const sentAt = new Date();
   await VerificationChallenge.findOneAndUpdate(
     { accountKey: key },
-    { codeDigest: codeDigest(code), intent, channel, sentAt, expiresAt: new Date(sentAt.getTime() + 10 * 60_000), attempts: 0 },
+    { codeDigest: codeDigest(code), intent: 'signin', channel, sentAt, expiresAt: new Date(sentAt.getTime() + 10 * 60_000), attempts: 0 },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
-  if (!config.developmentAuthCodes) {
+  const useDevelopmentCode = config.developmentAuthCodes;
+  if (!useDevelopmentCode) {
     try {
       await sendVerificationCode({ email, phone, code, channel });
     } catch (error) {
@@ -134,11 +120,11 @@ export async function requestVerificationCode(req, res) {
 
   const destination = channel === 'sms' ? maskPhone(phone) : maskEmail(email);
   return res.json({
-    message: config.developmentAuthCodes
+    message: useDevelopmentCode
       ? 'Local development verification code generated.'
       : `A verification code was sent by ${channel === 'sms' ? 'SMS' : 'email'} to ${destination}`,
     destination,
-    ...(config.developmentAuthCodes ? { developmentCode: code } : {})
+    ...(useDevelopmentCode ? { developmentCode: code } : {})
   });
 }
 
@@ -146,30 +132,15 @@ export async function verifyEmailCode(req, res) {
   const intent = req.body.intent;
   const channel = verificationChannel(req.body.channel);
   const code = typeof req.body.code === 'string' ? req.body.code.trim() : '';
-  if (!['signup', 'signin'].includes(intent) || !/^\d{6}$/.test(code)) {
+  if (intent !== 'signin' || !/^\d{6}$/.test(code)) {
     throw new ApiError(400, 'Enter the six-digit verification code');
   }
 
-  let details;
-  let user;
-  let email;
-  let phone;
-  let key;
-  if (intent === 'signup') {
-    details = signupDetails(req.body);
-    email = details.email;
-    phone = details.phone;
-    if (channel === 'email' && !email) throw new ApiError(400, 'Enter an email address to receive your confirmation code');
-    if (channel === 'sms' && !phone) throw new ApiError(400, 'Enter a phone number to receive your confirmation code');
-    key = accountKey(details);
-  } else {
-    const identifier = typeof req.body.identifier === 'string' ? req.body.identifier.trim() : '';
-    user = await findUserByIdentifier(identifier.includes('@') ? normalizeEmail(identifier) : normalizePhone(identifier));
-    if (!user) throw new ApiError(404, 'No account was found for that email or phone number');
-    email = user.email;
-    phone = user.phone;
-    key = accountKey(user);
-  }
+  const identifier = typeof req.body.identifier === 'string' ? req.body.identifier.trim() : '';
+  if (!identifier) throw new ApiError(400, 'Enter your email address or phone number');
+  const user = await findUserByIdentifier(identifier.includes('@') ? normalizeEmail(identifier) : normalizePhone(identifier));
+  if (!user) throw new ApiError(404, 'No account was found for that email or phone number');
+  const key = accountKey(user);
 
   const challenge = await VerificationChallenge.findOne({ accountKey: key, intent, channel });
   if (!challenge || challenge.expiresAt <= new Date()) {
@@ -187,22 +158,25 @@ export async function verifyEmailCode(req, res) {
   }
 
   await challenge.deleteOne();
-  if (intent === 'signup') {
-    const existingContacts = [email && { email }, phone && { phone }].filter(Boolean);
-    if (await User.exists({ $or: existingContacts })) {
-      throw new ApiError(409, 'An account with this email or phone number already exists');
-    }
-    try {
-      user = await User.create({
-        ...details
-      });
-    } catch (error) {
-      if (error.code === 11000) throw new ApiError(409, 'An account with this email or phone number already exists');
-      throw error;
-    }
+  return res.json(verificationToken(user));
+}
+
+export async function register(req, res) {
+  const details = signupDetails(req.body);
+  const existingContacts = [details.email && { email: details.email }, details.phone && { phone: details.phone }].filter(Boolean);
+  if (await User.exists({ $or: existingContacts })) {
+    throw new ApiError(409, 'An account with this email or phone number already exists');
   }
 
-  return res.json(verificationToken(user));
+  let user;
+  try {
+    user = await User.create(details);
+  } catch (error) {
+    if (error.code === 11000) throw new ApiError(409, 'An account with this email or phone number already exists');
+    throw error;
+  }
+
+  return res.status(201).json(verificationToken(user));
 }
 
 export async function getCurrentUser(req, res) {
@@ -210,4 +184,3 @@ export async function getCurrentUser(req, res) {
   if (!user) throw new ApiError(401, 'Account no longer exists');
   return res.json({ user: publicUser(user) });
 }
-
