@@ -24,6 +24,8 @@ export const config = {
   smtpUser: process.env.SMTP_USER ?? '',
   smtpPassword: process.env.SMTP_PASSWORD ?? '',
   smtpFrom: process.env.SMTP_FROM ?? '',
+  resendApiKey: process.env.RESEND_API_KEY ?? '',
+  resendFrom: process.env.RESEND_FROM ?? '',
   developmentAuthCodes: process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_CODES === 'true',
   twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? '',
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? '',

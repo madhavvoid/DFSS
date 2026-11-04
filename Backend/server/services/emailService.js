@@ -2,9 +2,46 @@ import nodemailer from 'nodemailer';
 import { config } from '../config/env.js';
 import { ApiError } from '../middleware/errorHandler.js';
 
+async function sendEmailCodeWithResend(email, code) {
+  const from = config.resendFrom || config.smtpFrom;
+  if (!from) {
+    throw new ApiError(503, 'Configure RESEND_FROM to send verification emails through Resend.');
+  }
+
+  let response;
+  try {
+    response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${config.resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from,
+        to: [email],
+        subject: 'Your TPCM verification code',
+        text: `Your TPCM verification code is ${code}. It expires in 10 minutes. If you did not request this code, you can ignore this email.`,
+        html: `<p>Your TPCM verification code is:</p><p style="font-size:28px;font-weight:700;letter-spacing:8px">${code}</p><p>This code expires in 10 minutes. If you did not request it, you can ignore this email.</p>`
+      }),
+      signal: AbortSignal.timeout(10000)
+    });
+  } catch {
+    throw new ApiError(502, 'Could not connect to Resend. Check the API key and try again.');
+  }
+
+  if (!response.ok) {
+    throw new ApiError(502, `Resend could not deliver the verification email (HTTP ${response.status}). Check the sender domain and API key.`);
+  }
+}
+
 async function sendEmailCode(email, code) {
+  if (config.resendApiKey) {
+    await sendEmailCodeWithResend(email, code);
+    return;
+  }
+
   if (!config.smtpHost || !config.smtpFrom) {
-    throw new ApiError(503, 'Email verification is not configured. Contact the site administrator.');
+    throw new ApiError(503, 'Email verification is not configured. Set RESEND_API_KEY and RESEND_FROM, or configure SMTP.');
   }
   if (Boolean(config.smtpUser) !== Boolean(config.smtpPassword)) {
     throw new ApiError(503, 'Configure both SMTP_USER and SMTP_PASSWORD to send verification emails.');
