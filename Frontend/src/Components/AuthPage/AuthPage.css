@@ -64,6 +64,8 @@
 .auth-code-actions { margin-top: 13px; display: flex; justify-content: space-between; }
 .auth-code-actions button { padding: 5px 0; border: 0; color: var(--auth-green); background: transparent; font: 700 11px "Manrope", sans-serif; cursor: pointer; }
 .auth-code-actions button:disabled { opacity: .55; cursor: wait; }
+.auth-other-storage { margin-top: 12px; padding: 5px 0; border: 0; color: var(--auth-green); background: transparent; font: 700 11px "Manrope", sans-serif; cursor: pointer; }
+.auth-other-storage:hover { text-decoration: underline; text-underline-offset: 3px; }
 .auth-page-footer { min-height: 58px; padding: 0 clamp(20px, 7vw, 104px); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #dceaff; color: #71809a; background: #fff; font: 9px "IBM Plex Mono", monospace; }
 
 @media (max-width: 940px) {

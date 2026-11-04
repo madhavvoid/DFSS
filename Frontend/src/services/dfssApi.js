@@ -1,6 +1,6 @@
 const STORAGE_KEY = "dfss-auth-token";
 const USER_KEY = "dfss-auth-user";
-const DEFAULT_API_URL = "http://localhost:4000";
+const DEFAULT_API_URL = import.meta.env.PROD ? window.location.origin : "http://localhost:4000";
 
 export function getDfssApiBaseUrl() {
   const configured = (import.meta.env.VITE_DFSS_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "");

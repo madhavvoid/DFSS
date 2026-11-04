@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: dfss-app
+    runtime: node
+    plan: free
+    buildCommand: npm ci --prefix Backend/server && npm ci --prefix Frontend && npm run build --prefix Frontend
+    startCommand: npm start --prefix Backend/server
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.11.0
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_SHARED_SECRET
+        generateValue: true
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_SECURE
+        value: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false

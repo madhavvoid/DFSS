@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { formatBytes, formatDate } from "../../utils/fileUtils";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  || (import.meta.env.PROD ? window.location.origin : "http://localhost:4000");
 
 function StorageNodesView({ token }) {
   const [nodes, setNodes] = useState([]);

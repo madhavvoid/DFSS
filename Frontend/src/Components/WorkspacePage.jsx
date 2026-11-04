@@ -5,12 +5,15 @@ import DriveHeader from "./DriveHeader";
 import DriveSidebar from "./DriveSidebar";
 import FileList from "./FileList";
 import FolderDialog from "./FolderDialog";
+import AuthLandingPage from "./AuthLandingPage/AuthLandingPage";
+import AuthPage from "./AuthPage/AuthPage";
 import { connectGoogleAccount } from "../services/googleAuth";
 import {
   clearDfssAuth,
   fetchDfssCurrentUser,
   listDfssNodes,
   loginDfssAccount,
+  persistDfssAuth,
   readDfssAuth,
   registerDfssAccount,
 } from "../services/dfssApi";
@@ -47,7 +50,8 @@ function WorkspacePage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [authIntent, setAuthIntent] = useState("signin");
-  const [authOpen, setAuthOpen] = useState(!(savedDfssSession.token || savedDfssSession.user));
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authPageOpen, setAuthPageOpen] = useState(false);
   const [authError, setAuthError] = useState("");
   const [folderOpen, setFolderOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -60,6 +64,7 @@ function WorkspacePage() {
   const isDfss = mode === "dfss";
 
   useEffect(() => {
+    if (!isAuthenticated) return undefined;
     let cancelled = false;
     listEntries(mode, activeToken, currentFolder.id)
       .then((result) => {
@@ -72,7 +77,7 @@ function WorkspacePage() {
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [mode, activeToken, currentFolder.id, refreshKey]);
+  }, [mode, activeToken, currentFolder.id, refreshKey, isAuthenticated]);
 
   useEffect(() => {
     if (mode !== "dfss" || !dfssToken) {
@@ -228,6 +233,38 @@ function WorkspacePage() {
     setAuthError("");
   }
 
+  function handleAuthenticated(session) {
+    persistDfssAuth(session.token, session.user);
+    setDfssToken(session.token);
+    setProfile(session.user);
+    setMode("dfss");
+    setIsAuthenticated(true);
+    setLoading(true);
+    setError("");
+    setFolderPath([{ id: null, name: "Vault" }]);
+    setActiveView("drive");
+    setAuthPageOpen(false);
+    setNotice("Connected to the DFSS coordinator.");
+  }
+
+  function signOut() {
+    clearDfssAuth();
+    setDfssToken("");
+    setAccessToken("");
+    setProfile(null);
+    setMode("local");
+    setIsAuthenticated(false);
+    setAuthPageOpen(false);
+    setAuthOpen(false);
+    setFolderPath([{ id: null, name: "Vault" }]);
+    setActiveView("drive");
+  }
+
+  function openOtherStorageOptions() {
+    setAuthPageOpen(false);
+    setAuthOpen(true);
+  }
+
   async function handleUpload(event) {
     const selectedFiles = Array.from(event.target.files || []);
     if (!selectedFiles.length) return;
@@ -339,7 +376,18 @@ function WorkspacePage() {
     setActiveView(view);
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && authPageOpen) {
+    return (
+      <AuthPage
+        initialIntent={authIntent}
+        onAuthenticated={handleAuthenticated}
+        onBack={() => setAuthPageOpen(false)}
+        onOtherStorage={openOtherStorageOptions}
+      />
+    );
+  }
+
+  if (!isAuthenticated && authOpen) {
     return (
       <div className="drive-app">
         <AuthDialog
@@ -355,9 +403,28 @@ function WorkspacePage() {
     );
   }
 
+  if (!isAuthenticated) {
+    return (
+      <AuthLandingPage
+        onOpenAuth={(intent) => {
+          setAuthIntent(intent);
+          setAuthPageOpen(true);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="drive-app">
-      <DriveHeader search={search} onSearch={setSearch} profile={profile} onDisconnect={disconnectCurrentStorage} onOpenAuth={openAuth} />
+      <DriveHeader
+        search={search}
+        onSearch={setSearch}
+        profile={profile}
+        account={mode === "dfss" ? profile : null}
+        onSignOut={signOut}
+        onDisconnect={disconnectCurrentStorage}
+        onOpenAuth={openAuth}
+      />
       <div className="workspace-layout">
         <DriveSidebar
           busy={busy}
