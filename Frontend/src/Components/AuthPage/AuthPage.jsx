@@ -2,7 +2,7 @@ import { useState } from "react";
 import { register, requestEmailCode, verifyEmailCode } from "../../services/authService";
 import "./AuthPage.css";
 
-function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
+function AuthPage({ onAuthenticated, onBack, onOtherStorage, initialIntent = "signin" }) {
   const [intent, setIntent] = useState(initialIntent);
   const [step, setStep] = useState("details");
   const [name, setName] = useState("");
@@ -190,6 +190,7 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
               <p className="auth-privacy-note">Codes expire after 10 minutes. Never share your verification code.</p>
             </>
           )}
+          <button className="auth-other-storage" type="button" onClick={onOtherStorage}>Use Google Drive or browser storage</button>
         </section>
       </section>
       <footer className="auth-page-footer"><span>© TPCM</span><span>YOUR FILES, YOUR PLACE.</span></footer>
