@@ -1,101 +1,32 @@
 import { useState } from "react";
-import { register, requestEmailCode, verifyEmailCode } from "../../services/authService";
+import { login, register } from "../../services/authService";
 import "./AuthPage.css";
 
 function AuthPage({ onAuthenticated, onBack, onOtherStorage, initialIntent = "signin" }) {
   const [intent, setIntent] = useState(initialIntent);
-  const [step, setStep] = useState("details");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [identifier, setIdentifier] = useState("");
-  const [channel, setChannel] = useState("email");
-  const [code, setCode] = useState("");
-  const [destination, setDestination] = useState("");
-  const [developmentCode, setDevelopmentCode] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   function changeIntent(nextIntent) {
     setIntent(nextIntent);
-    if (nextIntent === "signup") setChannel("email");
-    setStep("details");
-    setCode("");
     setError("");
   }
 
-  function updateEmail(value) {
-    setEmail(value);
-    setError("");
-    if (value.trim()) setChannel("email");
-    else if (phone.trim()) setChannel("sms");
-  }
-
-  function updatePhone(value) {
-    setPhone(value);
-    setError("");
-    if (intent === "signin") {
-      if (value.trim()) setChannel("sms");
-      else if (email.trim()) setChannel("email");
-    }
-  }
-
-  function updateIdentifier(value) {
-    setIdentifier(value);
-    setError("");
-    const trimmedValue = value.trim();
-    setChannel(trimmedValue && !trimmedValue.includes("@") ? "sms" : "email");
-  }
-
-  function changeChannel(nextChannel) {
-    setChannel(nextChannel);
-    setError("");
-  }
-
-  function requestDetails() {
-    return intent === "signup" ? { intent, name, email, phone, channel: "email" } : { intent, identifier, channel };
-  }
-
-  async function handleSignup(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setBusy(true);
     setError("");
     try {
-      const result = await register({ name, email, phone });
-      onAuthenticated(result);
-    } catch (signupError) {
-      setError(signupError.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleRequestCode(event) {
-    event.preventDefault();
-    setBusy(true);
-    setError("");
-    try {
-      const result = await requestEmailCode(requestDetails());
-      setDestination(result.destination);
-      setDevelopmentCode(result.developmentCode ?? "");
-      setCode(result.developmentCode ?? "");
-      setStep("code");
-    } catch (requestError) {
-      setError(requestError.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleVerifyCode(event) {
-    event.preventDefault();
-    setBusy(true);
-    setError("");
-    try {
-      const result = await verifyEmailCode({ ...requestDetails(), code });
-      onAuthenticated(result);
-    } catch (verificationError) {
-      setError(verificationError.message);
+      const session = intent === "signup"
+        ? await register({ name, email, phone, password })
+        : await login({ email, password });
+      onAuthenticated(session);
+    } catch (authError) {
+      setError(authError.message || "Authentication could not be completed.");
     } finally {
       setBusy(false);
     }
@@ -124,72 +55,48 @@ function AuthPage({ onAuthenticated, onBack, onOtherStorage, initialIntent = "si
         <section className="auth-panel" aria-label={intent === "signup" ? "Create an account" : "Sign in"}>
           <div className="auth-panel-heading">
             <div>
-              <span className="auth-panel-kicker">{step === "code" ? `${channel === "sms" ? "SMS" : "EMAIL"} CONFIRMATION` : "WELCOME TO TPCM"}</span>
-              <h2>{step === "code" ? "Check your inbox." : intent === "signup" ? "Create your account" : "Welcome back"}</h2>
+              <span className="auth-panel-kicker">WELCOME TO TPCM</span>
+              <h2>{intent === "signup" ? "Create your account" : "Welcome back"}</h2>
             </div>
-            {step === "code" && <span className="auth-step-count">02 / 02</span>}
           </div>
-
-          {step === "details" ? (
-            <>
-              <div className="auth-tabs" role="tablist" aria-label="Account access">
-                <button type="button" role="tab" aria-selected={intent === "signin"} className={intent === "signin" ? "selected" : ""} onClick={() => changeIntent("signin")}>Sign in</button>
-                <button type="button" role="tab" aria-selected={intent === "signup"} className={intent === "signup" ? "selected" : ""} onClick={() => changeIntent("signup")}>Sign up</button>
-              </div>
-              <p className="auth-panel-copy">{intent === "signup" ? "Create an account with your email address and go straight to your dashboard." : "Sign in with the email or phone number on your account."}</p>
-              <form className="auth-form" onSubmit={intent === "signup" ? handleSignup : handleRequestCode}>
-                {intent === "signup" ? (
-                  <>
-                    <label htmlFor="auth-name">Full name</label>
-                    <input id="auth-name" autoComplete="name" maxLength="100" value={name} onChange={(event) => setName(event.target.value)} required />
-                    <label htmlFor="auth-email">Email address</label>
-                    <input id="auth-email" type="email" autoComplete="email" maxLength="254" value={email} onChange={(event) => updateEmail(event.target.value)} required />
-                    <label htmlFor="auth-phone">Phone number (optional)</label>
-                    <input id="auth-phone" type="tel" autoComplete="tel" placeholder="+1 555 123 4567" value={phone} onChange={(event) => updatePhone(event.target.value)} />
-                  </>
-                ) : (
-                  <>
-                    <label htmlFor="auth-identifier">Email or phone number</label>
-                    <input id="auth-identifier" autoComplete="username" placeholder="you@example.com or +1 555 123 4567" value={identifier} onChange={(event) => updateIdentifier(event.target.value)} required />
-                  </>
-                )}
-                {intent === "signin" && (
-                  <fieldset className="auth-channel-fieldset">
-                    <legend>Send confirmation code by</legend>
-                    <div className="auth-channel-toggle">
-                      <button type="button" className={channel === "email" ? "selected" : ""} aria-pressed={channel === "email"} onClick={() => changeChannel("email")}>Email</button>
-                      <button type="button" className={channel === "sms" ? "selected" : ""} aria-pressed={channel === "sms"} onClick={() => changeChannel("sms")}>Text message</button>
-                    </div>
-                  </fieldset>
-                )}
-                {error && <p className="auth-page-error" role="alert">{error}</p>}
-                <button className="auth-submit" type="submit" disabled={busy}>{busy ? (intent === "signup" ? "Creating account…" : "Sending code…") : intent === "signup" ? "Create account" : `Continue with ${channel === "sms" ? "SMS" : "email"} code`}<span aria-hidden="true">↗</span></button>
-              </form>
-              <p className="auth-privacy-note">{intent === "signup" ? "No verification code is needed to create your account." : `We’ll send a one-time code to your ${channel === "sms" ? "phone number" : "email address"}. Codes expire after 10 minutes.`}</p>
-            </>
-          ) : (
-            <>
-              <p className="auth-panel-copy">
-                {developmentCode ? (
-                  <>A local development code was generated for <strong>{destination}</strong>.</>
-                ) : (
-                  <>We sent a six-digit code by {channel === "sms" ? "text message" : "email"} to <strong>{destination}</strong>.</>
-                )} Enter it below to {intent === "signup" ? "finish creating your account" : "sign in"}.
-              </p>
-              {developmentCode && <p className="auth-development-code" role="status">Local development code: <strong>{developmentCode}</strong></p>}
-              <form className="auth-form code-form" onSubmit={handleVerifyCode}>
-                <label htmlFor="auth-code">Verification code</label>
-                <input id="auth-code" className="auth-code-input" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength="6" placeholder="000000" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} required />
-                {error && <p className="auth-page-error" role="alert">{error}</p>}
-                <button className="auth-submit" type="submit" disabled={busy || code.length !== 6}>{busy ? "Verifying…" : "Verify and continue"}<span aria-hidden="true">↗</span></button>
-              </form>
-              <div className="auth-code-actions">
-                <button type="button" onClick={handleRequestCode} disabled={busy}>Resend code</button>
-                <button type="button" onClick={() => { setStep("details"); setCode(""); setError(""); }}>Change details</button>
-              </div>
-              <p className="auth-privacy-note">Codes expire after 10 minutes. Never share your verification code.</p>
-            </>
-          )}
+          <div className="auth-tabs" role="tablist" aria-label="Account access">
+            <button type="button" role="tab" aria-selected={intent === "signin"} className={intent === "signin" ? "selected" : ""} onClick={() => changeIntent("signin")}>Sign in</button>
+            <button type="button" role="tab" aria-selected={intent === "signup"} className={intent === "signup" ? "selected" : ""} onClick={() => changeIntent("signup")}>Sign up</button>
+          </div>
+          <p className="auth-panel-copy">{intent === "signup" ? "Create an account with your email and a password." : "Sign in with the email and password on your account."}</p>
+          <form className="auth-form" onSubmit={handleSubmit}>
+            {intent === "signup" && (
+              <>
+                <label htmlFor="auth-name">Full name</label>
+                <input id="auth-name" autoComplete="name" maxLength="100" value={name} onChange={(event) => setName(event.target.value)} required />
+              </>
+            )}
+            <label htmlFor="auth-email">Email address</label>
+            <input id="auth-email" type="email" autoComplete="email" maxLength="254" value={email} onChange={(event) => setEmail(event.target.value)} required />
+            {intent === "signup" && (
+              <label htmlFor="auth-phone">Phone number (optional)</label>
+            )}
+            {intent === "signup" && (
+              <input id="auth-phone" type="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} />
+            )}
+            <label htmlFor="auth-password">Password</label>
+            <input
+              id="auth-password"
+              type="password"
+              autoComplete={intent === "signup" ? "new-password" : "current-password"}
+              minLength="8"
+              maxLength="72"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+            {intent === "signup" && <small className="auth-privacy-note">Use at least 8 characters. Your password is stored securely as a hash.</small>}
+            {error && <p className="auth-page-error" role="alert">{error}</p>}
+            <button className="auth-submit" type="submit" disabled={busy}>
+              {busy ? "Please wait…" : intent === "signup" ? "Create account" : "Sign in"}
+              <span aria-hidden="true">↗</span>
+            </button>
+          </form>
           <button className="auth-other-storage" type="button" onClick={onOtherStorage}>Use Google Drive or browser storage</button>
         </section>
       </section>

@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 100 },
   email: { type: String, lowercase: true, trim: true, maxlength: 254 },
-  phone: { type: String, trim: true, maxlength: 16 }
+  phone: { type: String, trim: true, maxlength: 16 },
+  passwordHash: { type: String, required: true, select: false }
 }, { timestamps: true, autoIndex: false });
 
 userSchema.index({ email: 1 }, { unique: true, sparse: true, name: 'user_email_unique_sparse' });
