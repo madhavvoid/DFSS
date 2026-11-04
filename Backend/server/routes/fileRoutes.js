@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { config } from '../config/env.js';
 import { uploadDirectory } from '../utils/fileUtils.js';
 import { requireAuth } from '../middleware/auth.js';
+import { existsSync } from 'node:fs';
 import { deleteFile, downloadFile, getFile, getFileStatus, listFiles, uploadFile } from '../controllers/fileController.js';
 
 const router = Router();
@@ -17,7 +18,21 @@ const upload = multer({
 
 router.use(requireAuth);
 router.get('/', listFiles);
-router.post('/upload', upload.single('file'), uploadFile);
+router.post(
+  '/upload',
+  upload.single('file'),
+  (req, res, next) => {
+    console.log('UPLOAD DIAGNOSTIC:', {
+      fileReceived: Boolean(req.file),
+      filePath: req.file?.path,
+      fileSize: req.file?.size,
+      fileExists: req.file ? existsSync(req.file.path) : false
+    });
+
+    next();
+  },
+  uploadFile
+);
 router.get('/:fileId/status', getFileStatus);
 router.get('/:fileId/download', downloadFile);
 router.get('/:fileId', getFile);

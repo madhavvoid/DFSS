@@ -1,7 +1,9 @@
 import EntryIcon from "./EntryIcon";
 import { formatBytes, formatDate, isFolder } from "../utils/fileUtils";
 
-function FileList({ entries, loading, search, activeView, isGoogle, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
+function FileList({ entries, loading, search, activeView, isGoogle, isDfss, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
+  const storageFootnote = isGoogle ? "Files are saved to your Google Drive account." : isDfss ? "Files are managed by the DFSS coordinator and stored on the current healthy storage nodes." : "Browser storage stays on this device and is not uploaded to a server.";
+
   return (
     <>
       {error && <div className="notice notice-error" role="alert"><span>{error}</span><button type="button" onClick={onDismissError} aria-label="Dismiss error">×</button></div>}
@@ -34,13 +36,13 @@ function FileList({ entries, loading, search, activeView, isGoogle, busy, layout
         )) : (
           <div className="empty-state" onDragOver={(event) => event.preventDefault()} onDrop={onDrop}>
             <div className="empty-illustration" aria-hidden="true"><span /><span /><span /></div>
-            <h2>{search ? "No matching files" : activeView === "recent" ? "Nothing new in your archive." : "Your vault is ready."}</h2>
-            <p>{search ? "Try another name or clear the search." : isGoogle ? "Add a file to this connected storage location." : "Drop a file here or add your first item to TPCM Vault."}</p>
+            <h2>{search ? "No matching files" : activeView === "recent" ? "Nothing new in your archive." : isDfss ? "No files are stored yet." : "Your vault is ready."}</h2>
+            <p>{search ? "Try another name or clear the search." : isDfss ? "Upload a file to the DFSS coordinator to begin distributed storage." : isGoogle ? "Add a file to this connected storage location." : "Drop a file here or add your first item to TPCM Vault."}</p>
             {!search && <button className="empty-upload" type="button" onClick={onUpload} disabled={busy}>Choose files <span aria-hidden="true">↑</span></button>}
           </div>
         )}
       </section>
-      <div className="workspace-footnote"><span className="footnote-dot" /> {isGoogle ? "Files are saved to your Google Drive account." : "Browser storage stays on this device and is not uploaded to a server."}</div>
+      <div className="workspace-footnote"><span className="footnote-dot" /> {storageFootnote}</div>
     </>
   );
 }

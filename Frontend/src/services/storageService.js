@@ -12,24 +12,48 @@ import {
   listGoogleEntries,
   uploadGoogleEntries,
 } from "./googleDrive";
+import {
+  deleteDfssFile,
+  downloadDfssFile,
+  listDfssFiles,
+  uploadDfssFile,
+} from "./dfssApi";
 import { downloadBlob, FOLDER_MIME_TYPE } from "../utils/fileUtils";
 
 export { FOLDER_MIME_TYPE };
 
 export function listEntries(mode, token, parentId) {
-  return mode === "local" ? listBrowserEntries(parentId) : listGoogleEntries(token, parentId);
+  if (mode === "local") return listBrowserEntries(parentId);
+  if (mode === "google") return listGoogleEntries(token, parentId);
+  if (mode === "dfss") return listDfssFiles(token);
+  throw new Error("Unsupported storage mode.");
 }
 
-export function uploadEntries(mode, token, files, parentId) {
-  return mode === "local" ? uploadBrowserEntries(files, parentId) : uploadGoogleEntries(token, files, parentId);
+export async function uploadEntries(mode, token, files, parentId) {
+  if (mode === "local") return uploadBrowserEntries(files, parentId);
+  if (mode === "google") return uploadGoogleEntries(token, files, parentId);
+  if (mode === "dfss") {
+    if (!files || files.length === 0) throw new Error("Choose a file to upload.");
+    if (files.length > 1) throw new Error("DFSS uploads are limited to one file at a time.");
+    return uploadDfssFile(token, files[0]);
+  }
+  throw new Error("Unsupported storage mode.");
 }
 
 export function createFolder(mode, token, name, parentId) {
-  return mode === "local" ? createBrowserFolder(name, parentId) : createGoogleFolder(token, name, parentId);
+  if (mode === "local") return createBrowserFolder(name, parentId);
+  if (mode === "google") return createGoogleFolder(token, name, parentId);
+  if (mode === "dfss") {
+    throw new Error("The DFSS coordinator does not support virtual folders in the frontend.");
+  }
+  throw new Error("Unsupported storage mode.");
 }
 
 export function deleteEntry(mode, token, entry) {
-  return mode === "local" ? deleteBrowserEntry(entry) : deleteGoogleEntry(token, entry);
+  if (mode === "local") return deleteBrowserEntry(entry);
+  if (mode === "google") return deleteGoogleEntry(token, entry);
+  if (mode === "dfss") return deleteDfssFile(token, entry.id ?? entry._id);
+  throw new Error("Unsupported storage mode.");
 }
 
 export async function downloadEntry(mode, token, entry) {
@@ -40,5 +64,15 @@ export async function downloadEntry(mode, token, entry) {
     return;
   }
 
-  await downloadGoogleEntry(token, entry);
+  if (mode === "google") {
+    await downloadGoogleEntry(token, entry);
+    return;
+  }
+
+  if (mode === "dfss") {
+    await downloadDfssFile(token, entry);
+    return;
+  }
+
+  throw new Error("Unsupported storage mode.");
 }

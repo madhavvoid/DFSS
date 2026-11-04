@@ -1,23 +1,51 @@
 :root {
   font-family: "Space Grotesk", sans-serif;
   color: #182036;
-  background: #f6f7fa;
+  background: #f3f6fb;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   --ink: #182036;
   --muted: #65718a;
-  --paper: #f6f7fa;
+  --paper: #f3f6fb;
   --line: #e0e5ef;
   --green: #4c62df;
   --acid: #8ce0c3;
   --orange: #e39a63;
+  --dark: #122033;
+  --soft: #eef4ff;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 78px; }
-body { margin: 0; min-width: 320px; }
-body, button, a { font-family: "Space Grotesk", sans-serif; }
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body, button, input, select, textarea, a {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
 a { color: inherit; }
-::selection { color: var(--ink); background: var(--acid); }
-:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+
+::selection {
+  color: var(--ink);
+  background: var(--acid);
+}
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+}

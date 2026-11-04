@@ -7,6 +7,14 @@ import FileList from "./FileList";
 import FolderDialog from "./FolderDialog";
 import { connectGoogleAccount } from "../services/googleAuth";
 import {
+  clearDfssAuth,
+  fetchDfssCurrentUser,
+  listDfssNodes,
+  loginDfssAccount,
+  readDfssAuth,
+  registerDfssAccount,
+} from "../services/dfssApi";
+import {
   createFolder,
   deleteEntry,
   downloadEntry,
@@ -14,15 +22,20 @@ import {
   listEntries,
   uploadEntries,
 } from "../services/storageService";
+import { formatBytes } from "../utils/fileUtils";
 import "./DriveWorkspace.css";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function WorkspacePage() {
-  const [mode, setMode] = useState("local");
+  const savedDfssSession = readDfssAuth();
+  const [mode, setMode] = useState(savedDfssSession.token ? "dfss" : "local");
   const [accessToken, setAccessToken] = useState("");
-  const [profile, setProfile] = useState(null);
+  const [dfssToken, setDfssToken] = useState(savedDfssSession.token ?? "");
+  const [profile, setProfile] = useState(savedDfssSession.user ?? null);
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(savedDfssSession.token || savedDfssSession.user));
   const [entries, setEntries] = useState([]);
+  const [dfssNodes, setDfssNodes] = useState([]);
   const [folderPath, setFolderPath] = useState([{ id: null, name: "Vault" }]);
   const [activeView, setActiveView] = useState("drive");
   const [recentSince, setRecentSince] = useState(0);
@@ -34,7 +47,7 @@ function WorkspacePage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [authIntent, setAuthIntent] = useState("signin");
-  const [authOpen, setAuthOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(!(savedDfssSession.token || savedDfssSession.user));
   const [authError, setAuthError] = useState("");
   const [folderOpen, setFolderOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -42,22 +55,62 @@ function WorkspacePage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const uploadInput = useRef(null);
   const currentFolder = folderPath[folderPath.length - 1];
+  const activeToken = mode === "dfss" ? dfssToken : accessToken;
   const isGoogle = mode === "google";
+  const isDfss = mode === "dfss";
 
   useEffect(() => {
     let cancelled = false;
-    listEntries(mode, accessToken, currentFolder.id)
+    listEntries(mode, activeToken, currentFolder.id)
       .then((result) => {
         if (!cancelled) setEntries(result);
       })
       .catch((requestError) => {
-        if (!cancelled) setError(requestError.message || "Could not load this folder.");
+        if (!cancelled) setError(requestError.message || "Could not load this storage location.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [mode, accessToken, currentFolder.id, refreshKey]);
+  }, [mode, activeToken, currentFolder.id, refreshKey]);
+
+  useEffect(() => {
+    if (mode !== "dfss" || !dfssToken) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    listDfssNodes(dfssToken)
+      .then((nodes) => {
+        if (!cancelled) setDfssNodes(nodes);
+      })
+      .catch(() => {
+        if (!cancelled) setDfssNodes([]);
+      });
+
+    return () => { cancelled = true; };
+  }, [mode, dfssToken, refreshKey]);
+
+  useEffect(() => {
+    if (!dfssToken || mode !== "dfss") return undefined;
+
+    let cancelled = false;
+    fetchDfssCurrentUser(dfssToken)
+      .then((user) => {
+        if (!cancelled) setProfile(user);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          clearDfssAuth();
+          setDfssToken("");
+          setProfile(null);
+          setMode("local");
+          setError("Your DFSS session expired. Please sign in again.");
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [dfssToken, mode]);
 
   useEffect(() => {
     if (!authOpen && !folderOpen && !deleteTarget) return undefined;
@@ -84,6 +137,8 @@ function WorkspacePage() {
     });
   const fileCount = entries.filter((entry) => entry.mimeType !== FOLDER_MIME_TYPE).length;
   const folderSize = entries.reduce((total, entry) => total + Number(entry.size || 0), 0);
+  const onlineNodeCount = dfssNodes.filter((node) => node.status === "online").length;
+  const storageHealth = dfssNodes.length ? (onlineNodeCount ? "Healthy" : "Waiting for node health") : "Unavailable";
 
   function refresh() {
     setLoading(true);
@@ -110,6 +165,7 @@ function WorkspacePage() {
       setAccessToken(result.token);
       setProfile(result.profile);
       setMode("google");
+      setIsAuthenticated(true);
       setLoading(true);
       setError("");
       setFolderPath([{ id: null, name: "Vault" }]);
@@ -123,11 +179,48 @@ function WorkspacePage() {
     }
   }
 
+  async function handleDfssAuth({ mode: dfssMode, name, email, password }) {
+    const trimmedEmail = (email ?? "").trim();
+    const trimmedPassword = (password ?? "").trim();
+    const trimmedName = (name ?? "").trim();
+
+    if (!trimmedEmail || !trimmedPassword || (dfssMode === "signup" && !trimmedName)) {
+      setAuthError("Enter a valid name, email, and password to continue with DFSS.");
+      return;
+    }
+
+    setBusy(true);
+    setAuthError("");
+    try {
+      const result = dfssMode === "signup"
+        ? await registerDfssAccount(trimmedName, trimmedEmail, trimmedPassword)
+        : await loginDfssAccount(trimmedEmail, trimmedPassword);
+
+      setDfssToken(result.token);
+      setProfile(result.user);
+      setMode("dfss");
+      setIsAuthenticated(true);
+      setLoading(true);
+      setError("");
+      setFolderPath([{ id: null, name: "Vault" }]);
+      setActiveView("drive");
+      setAuthOpen(false);
+      setNotice(dfssMode === "signup" ? "Created the DFSS account and connected successfully." : "Connected to the DFSS coordinator.");
+    } catch (connectionError) {
+      setAuthError(connectionError.message || "Could not sign in to the DFSS coordinator.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function useLocalWorkspace() {
     setMode("local");
+    setIsAuthenticated(true);
     setLoading(true);
     setError("");
     setAccessToken("");
+    setDfssToken("");
+    clearDfssAuth();
     setProfile(null);
     setFolderPath([{ id: null, name: "Vault" }]);
     setActiveView("drive");
@@ -142,7 +235,7 @@ function WorkspacePage() {
     setError("");
     setNotice("");
     try {
-      await uploadEntries(mode, accessToken, selectedFiles, currentFolder.id);
+      await uploadEntries(mode, activeToken, selectedFiles, currentFolder.id);
       setNotice(`${selectedFiles.length} file${selectedFiles.length === 1 ? "" : "s"} added.`);
       refresh();
     } catch (uploadError) {
@@ -160,7 +253,7 @@ function WorkspacePage() {
     setBusy(true);
     setError("");
     try {
-      await uploadEntries(mode, accessToken, droppedFiles, currentFolder.id);
+      await uploadEntries(mode, activeToken, droppedFiles, currentFolder.id);
       setNotice(`${droppedFiles.length} file${droppedFiles.length === 1 ? "" : "s"} added.`);
       refresh();
     } catch (uploadError) {
@@ -177,7 +270,7 @@ function WorkspacePage() {
     setBusy(true);
     setError("");
     try {
-      await createFolder(mode, accessToken, trimmedName, currentFolder.id);
+      await createFolder(mode, activeToken, trimmedName, currentFolder.id);
       setFolderName("");
       setFolderOpen(false);
       setNotice(`Folder “${trimmedName}” created.`);
@@ -194,7 +287,7 @@ function WorkspacePage() {
     setBusy(true);
     setError("");
     try {
-      await deleteEntry(mode, accessToken, deleteTarget);
+      await deleteEntry(mode, activeToken, deleteTarget);
       setNotice(`“${deleteTarget.name}” removed.`);
       setDeleteTarget(null);
       refresh();
@@ -214,7 +307,7 @@ function WorkspacePage() {
       return;
     }
     try {
-      await downloadEntry(mode, accessToken, entry);
+      await downloadEntry(mode, activeToken, entry);
     } catch (downloadError) {
       setError(downloadError.message || "Could not download this file.");
     }
@@ -227,14 +320,18 @@ function WorkspacePage() {
     setSearch("");
   }
 
-  function disconnectGoogle() {
+  function disconnectCurrentStorage() {
     setAccessToken("");
+    setDfssToken("");
+    clearDfssAuth();
     setProfile(null);
     setMode("local");
+    setIsAuthenticated(false);
     setLoading(true);
     setError("");
     setFolderPath([{ id: null, name: "Vault" }]);
     setActiveView("drive");
+    setAuthOpen(true);
   }
 
   function selectView(view) {
@@ -242,9 +339,25 @@ function WorkspacePage() {
     setActiveView(view);
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="drive-app">
+        <AuthDialog
+          intent={authIntent}
+          busy={busy}
+          error={authError}
+          onConnectGoogle={handleGoogleConnect}
+          onConnectDfss={handleDfssAuth}
+          onUseLocal={useLocalWorkspace}
+          onClose={() => setAuthOpen(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="drive-app">
-      <DriveHeader search={search} onSearch={setSearch} profile={profile} onDisconnect={disconnectGoogle} onOpenAuth={openAuth} />
+      <DriveHeader search={search} onSearch={setSearch} profile={profile} onDisconnect={disconnectCurrentStorage} onOpenAuth={openAuth} />
       <div className="workspace-layout">
         <DriveSidebar
           busy={busy}
@@ -254,9 +367,10 @@ function WorkspacePage() {
           onSelectView={selectView}
           folderSize={folderSize}
           fileCount={fileCount}
-          isGoogle={isGoogle}
+          mode={mode}
           onConnect={() => openAuth("signin")}
-          onDisconnect={disconnectGoogle}
+          onConnectDfss={() => setAuthOpen(true)}
+          onDisconnect={disconnectCurrentStorage}
         />
         <input ref={uploadInput} className="visually-hidden" type="file" multiple onChange={handleUpload} />
         <main className="file-main" onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
@@ -267,20 +381,20 @@ function WorkspacePage() {
               <p>A considered space for your digital archive. Organize files here or connect a storage account when you need it.</p>
               <div className="vault-status">
                 <span className="status-led" />
-                <div><small>ACTIVE STORAGE</small><strong>{isGoogle ? "CONNECTED DRIVE" : "PRIVATE TO THIS DEVICE"}</strong></div>
+                <div><small>ACTIVE STORAGE</small><strong>{isGoogle ? "CONNECTED DRIVE" : isDfss ? "DFSS COORDINATOR" : "PRIVATE TO THIS DEVICE"}</strong></div>
               </div>
             </div>
             <div className="vault-index" role="img" aria-label="TPCM Vault file index and storage layers">
               <div className="index-head"><span>FILE / 001</span><span>VAULT SYSTEM</span></div>
               <div className="index-mark"><img src="/tpcm-vault-mark.svg" alt="" /></div>
               <div className="index-lines"><span /><span /><span /></div>
-              <div className="index-foot"><span>ARCHIVE INDEX</span><span>TP—CM / {isGoogle ? "REMOTE" : "LOCAL"}</span></div>
+              <div className="index-foot"><span>ARCHIVE INDEX</span><span>TP—CM / {isGoogle ? "REMOTE" : isDfss ? "DFSS" : "LOCAL"}</span></div>
             </div>
           </section>
           <div className="page-topline">
-            <div><div className="eyebrow">ARCHIVE INDEX <span>·</span> {isGoogle ? "CONNECTED STORAGE" : "PERSONAL STORAGE"}</div><h1>{activeView === "recent" ? "Recently added" : currentFolder.name === "Vault" ? "Vault contents" : currentFolder.name}</h1></div>
+            <div><div className="eyebrow">ARCHIVE INDEX <span>·</span> {isGoogle ? "CONNECTED STORAGE" : isDfss ? "COORDINATOR STORAGE" : "PERSONAL STORAGE"}</div><h1>{activeView === "recent" ? "Recently added" : currentFolder.name === "Vault" ? "Vault contents" : currentFolder.name}</h1></div>
             <div className="main-actions">
-              <button className="outline-action" type="button" onClick={() => { setFolderName(""); setFolderOpen(true); }} disabled={busy}>New folder</button>
+              <button className="outline-action" type="button" onClick={() => { setFolderName(""); setFolderOpen(true); }} disabled={busy || isDfss}>New folder</button>
               <button className="solid-action" type="button" onClick={() => uploadInput.current?.click()} disabled={busy}><span aria-hidden="true">↑</span> Upload files</button>
             </div>
           </div>
@@ -299,6 +413,7 @@ function WorkspacePage() {
             search={search}
             activeView={activeView}
             isGoogle={isGoogle}
+            isDfss={isDfss}
             busy={busy}
             layout={layout}
             sortKey={sortKey}
@@ -313,9 +428,86 @@ function WorkspacePage() {
             onDismissError={() => setError("")}
             onDismissNotice={() => setNotice("")}
           />
+
+          {isDfss && (
+            <div className="dfss-dashboard">
+              <div className="dfss-overview">
+                <div className="dfss-stat">
+                  <span className="dfss-stat-label">Stored files</span>
+                  <strong>{fileCount}</strong>
+                </div>
+                <div className="dfss-stat">
+                  <span className="dfss-stat-label">Total size</span>
+                  <strong>{formatBytes(folderSize)}</strong>
+                </div>
+                <div className="dfss-stat">
+                  <span className="dfss-stat-label">Available nodes</span>
+                  <strong>{dfssNodes.length}</strong>
+                </div>
+                <div className="dfss-stat">
+                  <span className="dfss-stat-label">Storage health</span>
+                  <strong>{storageHealth}</strong>
+                </div>
+              </div>
+
+              <div className="dfss-panels">
+                <section className="dfss-panel">
+                  <div className="dfss-panel-header">
+                    <h3>Storage-node status</h3>
+                    <button type="button" className="dfss-refresh" onClick={refresh}>Refresh</button>
+                  </div>
+                  {dfssNodes.length ? (
+                    <div className="dfss-node-list">
+                      {dfssNodes.map((node) => (
+                        <div key={node.id} className="dfss-node-row">
+                          <div>
+                            <strong>{node.id}</strong>
+                            <span>{node.address}</span>
+                          </div>
+                          <span className={`dfss-node-status status-${node.status ?? "unknown"}`}>{node.status ?? "unknown"}</span>
+                          <small>{node.lastHeartbeat ? new Date(node.lastHeartbeat).toLocaleString() : "Heartbeat unavailable"}</small>
+                          <small>{formatBytes(Number(node.usedBytes || 0))} used / {formatBytes(Number(node.capacityBytes || 0))}</small>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="dfss-empty">No storage-node data is currently available from the coordinator API.</p>
+                  )}
+                </section>
+
+                <section className="dfss-panel">
+                  <div className="dfss-panel-header">
+                    <h3>File metadata</h3>
+                  </div>
+                  {entries.length ? (
+                    <div className="dfss-file-metadata">
+                      {entries.map((entry) => (
+                        <div key={entry.id} className="dfss-file-row">
+                          <div className="dfss-file-primary">
+                            <strong>{entry.name}</strong>
+                            <span>{entry.id}</span>
+                          </div>
+                          <div className="dfss-file-inline">
+                            <span>Chunks: {entry.chunkCount ?? "n/a"}</span>
+                            <span>Configured replication: {entry.replicationFactor ?? "n/a"}</span>
+                          </div>
+                          <div className="dfss-file-inline">
+                            <span>Status: {entry.status ?? "unknown"}</span>
+                            <span>SHA-256: {entry.sha256 ? `${entry.sha256.slice(0, 12)}…${entry.sha256.slice(-8)}` : "n/a"}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="dfss-empty">Upload a file to see chunk, replication, and checksum metadata from the coordinator.</p>
+                  )}
+                </section>
+              </div>
+            </div>
+          )}
         </main>
       </div>
-      {authOpen && <AuthDialog intent={authIntent} busy={busy} error={authError} onConnectGoogle={handleGoogleConnect} onUseLocal={useLocalWorkspace} onClose={() => setAuthOpen(false)} />}
+      {authOpen && <AuthDialog intent={authIntent} busy={busy} error={authError} onConnectGoogle={handleGoogleConnect} onConnectDfss={handleDfssAuth} onUseLocal={useLocalWorkspace} onClose={() => setAuthOpen(false)} />}
       {folderOpen && <FolderDialog name={folderName} busy={busy} onNameChange={setFolderName} onCreate={handleCreateFolder} onClose={() => setFolderOpen(false)} />}
       {deleteTarget && <DeleteDialog entry={deleteTarget} isGoogle={isGoogle} busy={busy} onDelete={handleDelete} onClose={() => setDeleteTarget(null)} />}
     </div>
