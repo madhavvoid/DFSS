@@ -1,7 +1,9 @@
 import EntryIcon from "./EntryIcon";
 import { formatBytes, formatDate, isFolder } from "../utils/fileUtils";
 
-function FileList({ entries, loading, search, activeView, isGoogle, isDfss, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
+function FileList({ entries, loading, search, activeView, mode, busy, layout, sortKey, onSortChange, onLayoutChange, onUpload, onOpenEntry, onDeleteEntry, onDrop, error, notice, onDismissError, onDismissNotice }) {
+  const isGoogle = mode === "google";
+  const isDfss = mode === "dfss" || mode === "backend";
   const storageFootnote = isGoogle ? "Files are saved to your Google Drive account." : isDfss ? "Files are managed by the DFSS coordinator and stored on the current healthy storage nodes." : "Browser storage stays on this device and is not uploaded to a server.";
 
   return (

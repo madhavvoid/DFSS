@@ -10,10 +10,9 @@ function AuthDialog({ intent, busy, error, onConnectGoogle, onConnectDfss, onUse
     <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section className="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
         <button className="dialog-close" type="button" aria-label="Close" onClick={onClose}>×</button>
-        <span className="dialog-kicker">TPCM VAULT / ACCOUNT</span>
+        <span className="dialog-kicker">TPCM / ACCOUNT</span>
         <h2 id="auth-title">{intent === "signup" ? "Make room for your files." : "Your files, in reach."}</h2>
         <p>Choose how you want to store the archive. Google Drive uses your personal Google account; DFSS uses the coordinator API and distributed storage nodes.</p>
-
         <button className="google-action" type="button" onClick={onConnectGoogle} disabled={busy}><span className="google-g">G</span>{busy ? "Connecting…" : "Continue with Google"}<span className="google-arrow">↗</span></button>
 
         <div className="dfss-auth-panel">

@@ -2,7 +2,7 @@ import { formatBytes } from "../utils/fileUtils";
 
 function DriveSidebar({ busy, activeView, onUpload, onCreateFolder, onSelectView, folderSize, fileCount, mode, onConnect, onConnectDfss, onDisconnect }) {
   const isGoogle = mode === "google";
-  const isDfss = mode === "dfss";
+  const isDfss = mode === "dfss" || mode === "backend";
   const providerName = isGoogle ? "Google Drive" : isDfss ? "DFSS coordinator" : "Browser storage";
   const providerDetail = isGoogle ? "Account connected" : isDfss ? "Coordinator connected" : "Private to this device";
 

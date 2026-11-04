@@ -32,3 +32,9 @@ npm run dev
 ```
 
 Build and lint with `npm run build` and `npm run lint`.
+
+## Deploy to Netlify
+
+The repository-root `netlify.toml` configures Netlify to use `Frontend/` as the base directory, run `npm run build`, and publish `dist/`. Connect the repository to Netlify and deploy the branch you want to publish. Netlify also applies the SPA fallback so direct page navigation works.
+
+Browser-storage mode works without additional configuration. To enable Google Drive, set `VITE_GOOGLE_CLIENT_ID` in the Netlify site's environment variables and add the deployed site origin to the Google OAuth client's authorized JavaScript origins. To connect to the distributed backend, set `VITE_API_BASE_URL` to the separately hosted coordinator's public origin; the backend must allow the Netlify site origin through CORS. These `VITE_` variables are included in the browser bundle, so do not put secrets in them.

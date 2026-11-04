@@ -5,6 +5,12 @@ import DriveHeader from "./DriveHeader";
 import DriveSidebar from "./DriveSidebar";
 import FileList from "./FileList";
 import FolderDialog from "./FolderDialog";
+import DashboardView from "./AppViews/DashboardView";
+import UploadView from "./AppViews/UploadView";
+import StorageNodesView from "./AppViews/StorageNodesView";
+import ActivityView from "./AppViews/ActivityView";
+import SettingsView from "./AppViews/SettingsView";
+import "./AppViews/AppViews.css";
 import { connectGoogleAccount } from "../services/googleAuth";
 import {
   clearDfssAuth,
@@ -38,6 +44,13 @@ function WorkspacePage() {
   const [dfssNodes, setDfssNodes] = useState([]);
   const [folderPath, setFolderPath] = useState([{ id: null, name: "Vault" }]);
   const [activeView, setActiveView] = useState("drive");
+  const [activityItems, setActivityItems] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem("dfss-activity-items") || "[]");
+    } catch {
+      return [];
+    }
+  });
   const [recentSince, setRecentSince] = useState(0);
   const [layout, setLayout] = useState("list");
   const [sortKey, setSortKey] = useState("name");
@@ -55,12 +68,17 @@ function WorkspacePage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const uploadInput = useRef(null);
   const currentFolder = folderPath[folderPath.length - 1];
-  const activeToken = mode === "dfss" ? dfssToken : accessToken;
   const isGoogle = mode === "google";
-  const isDfss = mode === "dfss";
+  const isDfss = mode === "dfss" || mode === "backend";
+  const activeToken = isDfss ? dfssToken : accessToken;
+
+  useEffect(() => {
+    sessionStorage.setItem("dfss-activity-items", JSON.stringify(activityItems));
+  }, [activityItems]);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
     listEntries(mode, activeToken, currentFolder.id)
       .then((result) => {
         if (!cancelled) setEntries(result);
@@ -75,7 +93,7 @@ function WorkspacePage() {
   }, [mode, activeToken, currentFolder.id, refreshKey]);
 
   useEffect(() => {
-    if (mode !== "dfss" || !dfssToken) {
+    if (!isDfss || !dfssToken) {
       return undefined;
     }
 
@@ -89,10 +107,10 @@ function WorkspacePage() {
       });
 
     return () => { cancelled = true; };
-  }, [mode, dfssToken, refreshKey]);
+  }, [isDfss, dfssToken, refreshKey]);
 
   useEffect(() => {
-    if (!dfssToken || mode !== "dfss") return undefined;
+    if (!dfssToken || !isDfss) return undefined;
 
     let cancelled = false;
     fetchDfssCurrentUser(dfssToken)
@@ -110,7 +128,7 @@ function WorkspacePage() {
       });
 
     return () => { cancelled = true; };
-  }, [dfssToken, mode]);
+  }, [dfssToken, isDfss]);
 
   useEffect(() => {
     if (!authOpen && !folderOpen && !deleteTarget) return undefined;
@@ -412,8 +430,7 @@ function WorkspacePage() {
             loading={loading}
             search={search}
             activeView={activeView}
-            isGoogle={isGoogle}
-            isDfss={isDfss}
+            mode={mode}
             busy={busy}
             layout={layout}
             sortKey={sortKey}
