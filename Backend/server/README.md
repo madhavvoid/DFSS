@@ -7,6 +7,7 @@ The backend uses Node.js, Express, MongoDB, and separate HTTP storage-node proce
 Requirements: Node.js 20.12 or newer and MongoDB running locally or remotely.
 
 1. From this directory, copy `.env.example` to `.env` and set two different secrets of at least 32 characters for `JWT_SECRET` and `NODE_SHARED_SECRET`. Configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_FROM` to deliver sign-in codes. To enable text-message codes, also set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_PHONE` with a Twilio account.
+	Set `ADMIN_EMAILS` to a comma-separated list of administrator email addresses. Each administrator signs in through the regular email-code flow; only verified addresses in this list can access the admin API.
 2. Install dependencies with `npm install`.
 3. Start the coordinator with `npm start`.
 4. In another terminal in this directory, start three local storage nodes with `npm run start:nodes`.
@@ -15,10 +16,16 @@ The coordinator listens on `http://localhost:4000`; storage nodes use ports 8101
 
 ## API
 
-- `POST /api/auth/register` creates an account from `name`, `email`, and optional `phone`, then returns a bearer token and user. No email code is required; the client can take the new user directly to the dashboard.
-- `POST /api/auth/request-code` sends an email or SMS sign-in code. Send `channel: "email"` or `channel: "sms"` and an `identifier` containing the account email or phone number.
-- `POST /api/auth/verify-code` validates the six-digit sign-in code and matching channel, then returns a bearer token and user. Codes expire after ten minutes and allow up to five attempts.
+- `POST /api/auth/register` creates an account from `name`, `email`, optional `phone`, and optional `password`, then returns a bearer token and user. Passwords are bcrypt-hashed; passwordless clients can continue using email-code sign-in.
+- `POST /api/auth/login` accepts `email` and `password`, then returns a bearer token and user. The route is rate-limited.
+- `POST /api/auth/admin-login` accepts the same credentials but only returns a session for an email in `ADMIN_EMAILS`.
+- `POST /api/auth/set-password` sets or changes a password for the signed-in user. Changing an existing password requires `currentPassword`; use password recovery if it is forgotten.
+- `POST /api/auth/request-code` sends an email password-recovery code for `intent: "password-reset"` and the account email in `identifier`.
+- `POST /api/auth/reset-password` accepts the email, six-digit recovery code, and new password, then returns a bearer token and user. Codes expire after ten minutes and allow up to five attempts.
 - `GET /api/auth/me` returns the signed-in user.
+- `GET /api/admin/users` lists registered accounts and their last verified sign-in time (administrator only).
+- `GET /api/admin/uploads` lists uploaded file metadata and account owners (administrator only).
+- `GET /api/admin/uploads/:fileId/download` reconstructs and verifies an uploaded file (administrator only).
 - `POST /api/files/upload` accepts multipart form data with a `file` field.
 - `GET /api/files` lists the signed-in user's completed files.
 - `GET /api/files/:fileId` returns file and replica metadata.

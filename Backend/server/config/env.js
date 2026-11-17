@@ -28,6 +28,7 @@ export const config = {
   twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? '',
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? '',
   twilioFromPhone: process.env.TWILIO_FROM_PHONE ?? '',
+  adminEmails: (process.env.ADMIN_EMAILS ?? '').split(',').map((email) => email.trim().toLowerCase()).filter(Boolean),
   nodeSharedSecret: process.env.NODE_SHARED_SECRET ?? '',
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
   chunkSizeBytes: positiveInteger('CHUNK_SIZE_MB', 8) * 1024 * 1024,

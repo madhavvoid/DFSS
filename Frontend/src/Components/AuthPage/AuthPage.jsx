@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { register, requestEmailCode, verifyEmailCode } from "../../services/authService";
+import { loginWithAdminPassword, loginWithPassword, register, requestPasswordRecovery, resetPassword } from "../../services/authService";
 import "./AuthPage.css";
 
 function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
@@ -9,8 +9,9 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [identifier, setIdentifier] = useState("");
-  const [channel, setChannel] = useState("email");
   const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [destination, setDestination] = useState("");
   const [developmentCode, setDevelopmentCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -18,50 +19,38 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
 
   function changeIntent(nextIntent) {
     setIntent(nextIntent);
-    if (nextIntent === "signup") setChannel("email");
     setStep("details");
     setCode("");
+    setPassword("");
+    setConfirmPassword("");
     setError("");
   }
 
   function updateEmail(value) {
     setEmail(value);
     setError("");
-    if (value.trim()) setChannel("email");
-    else if (phone.trim()) setChannel("sms");
   }
 
   function updatePhone(value) {
     setPhone(value);
     setError("");
-    if (intent === "signin") {
-      if (value.trim()) setChannel("sms");
-      else if (email.trim()) setChannel("email");
-    }
   }
 
   function updateIdentifier(value) {
     setIdentifier(value);
     setError("");
-    const trimmedValue = value.trim();
-    setChannel(trimmedValue && !trimmedValue.includes("@") ? "sms" : "email");
-  }
-
-  function changeChannel(nextChannel) {
-    setChannel(nextChannel);
-    setError("");
-  }
-
-  function requestDetails() {
-    return intent === "signup" ? { intent, name, email, phone, channel: "email" } : { intent, identifier, channel };
   }
 
   async function handleSignup(event) {
     event.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
-      const result = await register({ name, email, phone });
+      const result = await register({ name, email, phone, password });
       onAuthenticated(result);
     } catch (signupError) {
       setError(signupError.message);
@@ -70,16 +59,33 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
     }
   }
 
-  async function handleRequestCode(event) {
+  async function handlePasswordLogin(event) {
     event.preventDefault();
     setBusy(true);
     setError("");
     try {
-      const result = await requestEmailCode(requestDetails());
+      const login = intent === "admin" ? loginWithAdminPassword : loginWithPassword;
+      const result = await login({ email: identifier, password });
+      onAuthenticated(result);
+    } catch (loginError) {
+      setError(loginError.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRequestRecovery(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const result = await requestPasswordRecovery(identifier);
       setDestination(result.destination);
       setDevelopmentCode(result.developmentCode ?? "");
       setCode(result.developmentCode ?? "");
-      setStep("code");
+      setPassword("");
+      setConfirmPassword("");
+      setStep("recovery");
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -87,15 +93,19 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
     }
   }
 
-  async function handleVerifyCode(event) {
+  async function handlePasswordReset(event) {
     event.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
-      const result = await verifyEmailCode({ ...requestDetails(), code });
+      const result = await resetPassword({ email: identifier, code, password });
       onAuthenticated(result);
-    } catch (verificationError) {
-      setError(verificationError.message);
+    } catch (resetError) {
+      setError(resetError.message);
     } finally {
       setBusy(false);
     }
@@ -121,13 +131,13 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
           <div className="auth-story-foot"><span>01</span><span>YOUR DIGITAL ARCHIVE STARTS HERE</span></div>
         </div>
 
-        <section className="auth-panel" aria-label={intent === "signup" ? "Create an account" : "Sign in"}>
+        <section className="auth-panel" aria-label={intent === "signup" ? "Create an account" : intent === "admin" ? "Administrator sign in" : "Sign in"}>
           <div className="auth-panel-heading">
             <div>
-              <span className="auth-panel-kicker">{step === "code" ? `${channel === "sms" ? "SMS" : "EMAIL"} CONFIRMATION` : "WELCOME TO TPCM"}</span>
-              <h2>{step === "code" ? "Check your inbox." : intent === "signup" ? "Create your account" : "Welcome back"}</h2>
+              <span className="auth-panel-kicker">{step === "recovery" ? "PASSWORD RECOVERY" : "WELCOME TO TPCM"}</span>
+              <h2>{step === "recovery" ? "Reset your password." : intent === "signup" ? "Create your account" : intent === "admin" ? "Administrator access" : "Welcome back"}</h2>
             </div>
-            {step === "code" && <span className="auth-step-count">02 / 02</span>}
+            {step === "recovery" && <span className="auth-step-count">02 / 02</span>}
           </div>
 
           {step === "details" ? (
@@ -135,9 +145,10 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
               <div className="auth-tabs" role="tablist" aria-label="Account access">
                 <button type="button" role="tab" aria-selected={intent === "signin"} className={intent === "signin" ? "selected" : ""} onClick={() => changeIntent("signin")}>Sign in</button>
                 <button type="button" role="tab" aria-selected={intent === "signup"} className={intent === "signup" ? "selected" : ""} onClick={() => changeIntent("signup")}>Sign up</button>
+                <button type="button" role="tab" aria-selected={intent === "admin"} className={intent === "admin" ? "selected" : ""} onClick={() => changeIntent("admin")}>Admin Login</button>
               </div>
-              <p className="auth-panel-copy">{intent === "signup" ? "Create an account with your email address and go straight to your dashboard." : "Sign in with the email or phone number on your account."}</p>
-              <form className="auth-form" onSubmit={intent === "signup" ? handleSignup : handleRequestCode}>
+              <p className="auth-panel-copy">{intent === "signup" ? "Create an account with your email address and go straight to your dashboard." : intent === "admin" ? "Use an administrator account to open the system console." : "Sign in with your email address and password."}</p>
+              <form className="auth-form" onSubmit={intent === "signup" ? handleSignup : handlePasswordLogin}>
                 {intent === "signup" ? (
                   <>
                     <label htmlFor="auth-name">Full name</label>
@@ -146,48 +157,46 @@ function AuthPage({ onAuthenticated, onBack, initialIntent = "signin" }) {
                     <input id="auth-email" type="email" autoComplete="email" maxLength="254" value={email} onChange={(event) => updateEmail(event.target.value)} required />
                     <label htmlFor="auth-phone">Phone number (optional)</label>
                     <input id="auth-phone" type="tel" autoComplete="tel" placeholder="+1 555 123 4567" value={phone} onChange={(event) => updatePhone(event.target.value)} />
+                    <label htmlFor="auth-password">Password</label>
+                    <input id="auth-password" type="password" autoComplete="new-password" minLength="8" maxLength="72" value={password} onChange={(event) => setPassword(event.target.value)} required />
+                    <label htmlFor="auth-confirm-password">Confirm password</label>
+                    <input id="auth-confirm-password" type="password" autoComplete="new-password" minLength="8" maxLength="72" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required />
                   </>
                 ) : (
                   <>
-                    <label htmlFor="auth-identifier">Email or phone number</label>
-                    <input id="auth-identifier" autoComplete="username" placeholder="you@example.com or +1 555 123 4567" value={identifier} onChange={(event) => updateIdentifier(event.target.value)} required />
+                    <label htmlFor="auth-identifier">{intent === "admin" ? "Administrator email" : "Email address"}</label>
+                    <input id="auth-identifier" type="email" autoComplete="username" placeholder="you@example.com" value={identifier} onChange={(event) => updateIdentifier(event.target.value)} required />
+                    <label htmlFor="auth-password">Password</label>
+                    <input id="auth-password" type="password" autoComplete="current-password" maxLength="72" value={password} onChange={(event) => setPassword(event.target.value)} required />
+                    {intent !== "signup" && <button className="auth-recovery-link" type="button" onClick={handleRequestRecovery} disabled={busy || !identifier.trim()}>Forgot password?</button>}
                   </>
                 )}
-                {intent === "signin" && (
-                  <fieldset className="auth-channel-fieldset">
-                    <legend>Send confirmation code by</legend>
-                    <div className="auth-channel-toggle">
-                      <button type="button" className={channel === "email" ? "selected" : ""} aria-pressed={channel === "email"} onClick={() => changeChannel("email")}>Email</button>
-                      <button type="button" className={channel === "sms" ? "selected" : ""} aria-pressed={channel === "sms"} onClick={() => changeChannel("sms")}>Text message</button>
-                    </div>
-                  </fieldset>
-                )}
                 {error && <p className="auth-page-error" role="alert">{error}</p>}
-                <button className="auth-submit" type="submit" disabled={busy}>{busy ? (intent === "signup" ? "Creating account…" : "Sending code…") : intent === "signup" ? "Create account" : `Continue with ${channel === "sms" ? "SMS" : "email"} code`}<span aria-hidden="true">↗</span></button>
+                <button className="auth-submit" type="submit" disabled={busy}>{busy ? (intent === "signup" ? "Creating account…" : "Signing in…") : intent === "signup" ? "Create account" : intent === "admin" ? "Admin Login" : "Sign in"}<span aria-hidden="true">↗</span></button>
               </form>
-              <p className="auth-privacy-note">{intent === "signup" ? "No verification code is needed to create your account." : `We’ll send a one-time code to your ${channel === "sms" ? "phone number" : "email address"}. Codes expire after 10 minutes.`}</p>
+              <p className="auth-privacy-note">{intent === "signup" ? "Use at least 8 characters. Your password is stored as a secure hash." : intent === "admin" ? "Administrator access is limited to accounts configured by the system owner." : "Use password recovery if you can’t access your account."}</p>
             </>
           ) : (
             <>
               <p className="auth-panel-copy">
-                {developmentCode ? (
-                  <>A local development code was generated for <strong>{destination}</strong>.</>
-                ) : (
-                  <>We sent a six-digit code by {channel === "sms" ? "text message" : "email"} to <strong>{destination}</strong>.</>
-                )} Enter it below to {intent === "signup" ? "finish creating your account" : "sign in"}.
+                {developmentCode ? <>A local recovery code was generated for <strong>{destination}</strong>.</> : <>A recovery code was sent to <strong>{destination}</strong>.</>} Enter the code and choose a new password below.
               </p>
               {developmentCode && <p className="auth-development-code" role="status">Local development code: <strong>{developmentCode}</strong></p>}
-              <form className="auth-form code-form" onSubmit={handleVerifyCode}>
-                <label htmlFor="auth-code">Verification code</label>
+              <form className="auth-form code-form" onSubmit={handlePasswordReset}>
+                <label htmlFor="auth-code">Recovery code</label>
                 <input id="auth-code" className="auth-code-input" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength="6" placeholder="000000" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} required />
+                <label htmlFor="auth-new-password">New password</label>
+                <input id="auth-new-password" type="password" autoComplete="new-password" minLength="8" maxLength="72" value={password} onChange={(event) => setPassword(event.target.value)} required />
+                <label htmlFor="auth-confirm-new-password">Confirm new password</label>
+                <input id="auth-confirm-new-password" type="password" autoComplete="new-password" minLength="8" maxLength="72" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required />
                 {error && <p className="auth-page-error" role="alert">{error}</p>}
-                <button className="auth-submit" type="submit" disabled={busy || code.length !== 6}>{busy ? "Verifying…" : "Verify and continue"}<span aria-hidden="true">↗</span></button>
+                <button className="auth-submit" type="submit" disabled={busy || code.length !== 6}>{busy ? "Resetting password…" : "Reset password and sign in"}<span aria-hidden="true">↗</span></button>
               </form>
               <div className="auth-code-actions">
-                <button type="button" onClick={handleRequestCode} disabled={busy}>Resend code</button>
+                <button type="button" onClick={handleRequestRecovery} disabled={busy}>Resend code</button>
                 <button type="button" onClick={() => { setStep("details"); setCode(""); setError(""); }}>Change details</button>
               </div>
-              <p className="auth-privacy-note">Codes expire after 10 minutes. Never share your verification code.</p>
+              <p className="auth-privacy-note">Recovery codes expire after 10 minutes and can only reset your password.</p>
             </>
           )}
         </section>

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const verificationChallengeSchema = new mongoose.Schema({
   accountKey: { type: String, required: true, unique: true },
   codeDigest: { type: String, required: true },
-  intent: { type: String, enum: ['signup', 'signin'], required: true },
+  intent: { type: String, enum: ['signup', 'signin', 'password-reset'], required: true },
   channel: { type: String, enum: ['email', 'sms'], required: true },
   expiresAt: { type: Date, required: true },
   sentAt: { type: Date, required: true },

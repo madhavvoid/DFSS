@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { config } from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import fileRoutes from './routes/fileRoutes.js';
 import nodeRoutes from './routes/nodeRoutes.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -13,6 +14,7 @@ app.use(cors({ origin: config.corsOrigin.split(',').map((origin) => origin.trim(
 app.use(express.json({ limit: '32kb' }));
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/nodes', nodeRoutes);
 app.use(notFoundHandler);

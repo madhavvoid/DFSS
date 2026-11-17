@@ -37,7 +37,7 @@
 .auth-panel-kicker { color: #758279; }
 .auth-panel h2 { margin: 10px 0 0; color: #20375e; font: 700 30px/1.15 "Manrope", sans-serif; }
 .auth-step-count { color: #768379; font: 10px "IBM Plex Mono", monospace; }
-.auth-tabs { margin-top: 27px; display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #d9dfd5; }
+.auth-tabs { margin-top: 27px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid #d9dfd5; }
 .auth-tabs button { min-height: 44px; border: 0; border-bottom: 2px solid transparent; color: #71809a; background: transparent; font: 700 13px "Manrope", sans-serif; cursor: pointer; }
 .auth-tabs button.selected { border-bottom-color: var(--auth-green); color: var(--auth-green); }
 .auth-panel-copy { margin: 18px 0 20px; color: #66746a; font-size: 13px; line-height: 1.6; }
@@ -64,6 +64,8 @@
 .auth-code-actions { margin-top: 13px; display: flex; justify-content: space-between; }
 .auth-code-actions button { padding: 5px 0; border: 0; color: var(--auth-green); background: transparent; font: 700 11px "Manrope", sans-serif; cursor: pointer; }
 .auth-code-actions button:disabled { opacity: .55; cursor: wait; }
+.auth-recovery-link { justify-self: start; margin: 0; padding: 3px 0; border: 0; color: var(--auth-green); background: transparent; font: 700 11px "Manrope", sans-serif; cursor: pointer; }
+.auth-recovery-link:disabled { opacity: .5; cursor: not-allowed; }
 .auth-page-footer { min-height: 58px; padding: 0 clamp(20px, 7vw, 104px); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #dceaff; color: #71809a; background: #fff; font: 9px "IBM Plex Mono", monospace; }
 
 @media (max-width: 940px) {

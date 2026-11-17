@@ -18,6 +18,14 @@ export function requireAuth(req, res, next) {
   }
 }
 
+export function requireAdmin(req, res, next) {
+  const email = req.user?.email?.toLowerCase();
+  if (!email || !config.adminEmails.includes(email)) {
+    return res.status(403).json({ error: 'Administrator access required' });
+  }
+  return next();
+}
+
 export function requireNodeSecret(req, res, next) {
   const provided = Buffer.from(req.get('x-node-token') ?? '');
   const expected = Buffer.from(config.nodeSharedSecret);

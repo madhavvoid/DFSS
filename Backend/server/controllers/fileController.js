@@ -152,8 +152,7 @@ async function* verifiedFileChunks(file, chunks) {
   if (fullHash.digest('hex') !== file.sha256) throw new Error('Reconstructed file checksum does not match metadata');
 }
 
-export async function downloadFile(req, res) {
-  const file = await findOwnedFile(req.params.fileId, req.user.id);
+async function streamFileDownload(file, res) {
   if (file.status !== 'complete') throw new ApiError(409, 'File is not complete');
   const chunks = await FileChunk.find({ fileId: file._id, state: 'complete' }).sort({ index: 1 }).lean();
   if (chunks.length !== file.chunkCount) throw new ApiError(503, 'File metadata is incomplete');
@@ -171,6 +170,18 @@ export async function downloadFile(req, res) {
     console.error(`Download failed for ${file._id}: ${error.message}`);
     return res.destroy(error);
   }
+}
+
+export async function downloadFile(req, res) {
+  const file = await findOwnedFile(req.params.fileId, req.user.id);
+  return streamFileDownload(file, res);
+}
+
+export async function downloadAdminFile(req, res) {
+  if (!/^[a-f\d]{24}$/i.test(req.params.fileId)) throw new ApiError(400, 'Invalid file ID');
+  const file = await File.findById(req.params.fileId);
+  if (!file) throw new ApiError(404, 'File not found');
+  return streamFileDownload(file, res);
 }
 
 export async function deleteFile(req, res) {

@@ -16,14 +16,55 @@ async function postAuth(path, body) {
   return result;
 }
 
-export function requestEmailCode(details) {
-  return postAuth("request-code", details);
+export function requestPasswordRecovery(email) {
+  return postAuth("request-code", { intent: "password-reset", channel: "email", identifier: email });
 }
 
 export function register(details) {
   return postAuth("register", details);
 }
 
-export function verifyEmailCode(details) {
-  return postAuth("verify-code", details);
+export function loginWithPassword(details) {
+  return postAuth("login", details);
+}
+
+export function loginWithAdminPassword(details) {
+  return postAuth("admin-login", details);
+}
+
+export function resetPassword(details) {
+  return postAuth("reset-password", details);
+}
+
+export async function setPassword(token, details) {
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/auth/set-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(details),
+    });
+  } catch {
+    throw new Error(`TPCM cannot reach the authentication server at ${API_BASE_URL}.`);
+  }
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || "Could not update the password.");
+  return result;
+}
+
+export async function getCurrentUser(token) {
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    throw new Error(`TPCM cannot reach the authentication server at ${API_BASE_URL}.`);
+  }
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || "Could not load the signed-in account.");
+  return result;
 }

@@ -12,8 +12,10 @@ import UploadView from "./AppViews/UploadView";
 import StorageNodesView from "./AppViews/StorageNodesView";
 import ActivityView from "./AppViews/ActivityView";
 import SettingsView from "./AppViews/SettingsView";
+import AdminView from "./AppViews/AdminView";
 import "./AppViews/AppViews.css";
 import { connectGoogleAccount } from "../services/googleAuth";
+import { getCurrentUser } from "../services/authService";
 import {
   createFolder,
   deleteEntry,
@@ -39,7 +41,7 @@ function WorkspacePage() {
   const [profile, setProfile] = useState(null);
   const [entries, setEntries] = useState([]);
   const [folderPath, setFolderPath] = useState([{ id: null, name: "Vault" }]);
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState(() => authSession?.user?.isAdmin ? "admin" : "dashboard");
   const [activeView, setActiveView] = useState("drive");
   const [activityItems, setActivityItems] = useState(() => {
     try {
@@ -69,6 +71,23 @@ function WorkspacePage() {
   const isGoogle = mode === "google";
   const isBackend = mode === "backend";
   const storageToken = isBackend ? authSession?.token : accessToken;
+
+  useEffect(() => {
+    if (!authSession?.token) return undefined;
+    let cancelled = false;
+    getCurrentUser(authSession.token)
+      .then(({ user }) => {
+        if (cancelled) return;
+        setAuthSession((current) => {
+          if (!current) return current;
+          const updated = { ...current, user };
+          sessionStorage.setItem("dfss-auth-session", JSON.stringify(updated));
+          return updated;
+        });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [authSession?.token]);
 
   useEffect(() => {
     sessionStorage.setItem("dfss-activity-items", JSON.stringify(activityItems));
@@ -298,11 +317,20 @@ function WorkspacePage() {
     setAuthSession(session);
     setMode("backend");
     setAccessToken("");
-    setActiveSection("dashboard");
+    setActiveSection(session.user.isAdmin ? "admin" : "dashboard");
     setActiveView("drive");
     setLoading(true);
     setError("");
     setAuthPageOpen(false);
+  }
+
+  function updateAccountUser(user) {
+    setAuthSession((current) => {
+      if (!current) return current;
+      const updated = { ...current, user };
+      sessionStorage.setItem("dfss-auth-session", JSON.stringify(updated));
+      return updated;
+    });
   }
 
   function signOut() {
@@ -336,6 +364,7 @@ function WorkspacePage() {
           fileCount={fileCount}
           isGoogle={isGoogle}
           isBackend={isBackend}
+          isAdmin={authSession.user.isAdmin}
           onConnect={() => openAuth("signin")}
           onDisconnect={disconnectGoogle}
         />
@@ -345,7 +374,8 @@ function WorkspacePage() {
           {activeSection === "upload" && <UploadView busy={busy} isGoogle={isGoogle} isBackend={isBackend} onChooseFiles={() => uploadInput.current?.click()} onDrop={handleDrop} error={error} notice={notice} onDismissError={() => setError("")} onDismissNotice={() => setNotice("")} />}
           {activeSection === "nodes" && <StorageNodesView token={authSession.token} />}
           {activeSection === "activity" && <ActivityView items={activityItems} />}
-          {activeSection === "settings" && <SettingsView user={authSession.user} isGoogle={isGoogle} isBackend={isBackend} onConnect={() => openAuth("signin")} onDisconnect={disconnectGoogle} onSignOut={signOut} />}
+          {activeSection === "settings" && <SettingsView user={authSession.user} token={authSession.token} isGoogle={isGoogle} isBackend={isBackend} onConnect={() => openAuth("signin")} onDisconnect={disconnectGoogle} onSignOut={signOut} onUserUpdated={updateAccountUser} />}
+          {activeSection === "admin" && authSession.user.isAdmin && <AdminView token={authSession.token} />}
           {activeSection === "files" && (
             <>
               <div className="page-topline">

@@ -1,4 +1,4 @@
-function DriveSidebar({ busy, activeSection, onUpload, isGoogle, isBackend, onSelectSection }) {
+function DriveSidebar({ busy, activeSection, onUpload, isGoogle, isBackend, isAdmin, onSelectSection }) {
   const sections = [
     { id: "dashboard", label: "Dashboard", glyph: "⌂" },
     { id: "files", label: "My Files", glyph: "▰" },
@@ -6,6 +6,7 @@ function DriveSidebar({ busy, activeSection, onUpload, isGoogle, isBackend, onSe
     { id: "nodes", label: "Storage Nodes", glyph: "▤" },
     { id: "activity", label: "Activity", glyph: "◷" },
     { id: "settings", label: "Settings", glyph: "⚙" },
+    ...(isAdmin ? [{ id: "admin", label: "Admin Console", glyph: "⌘" }] : []),
   ];
 
   return (

@@ -58,6 +58,27 @@
 .nodes-message { min-height: 150px; padding: 24px; display: grid; place-items: center; border: 1px solid #dfe4ed; color: #69758b; background: #fff; font-size: 12px; text-align: center; }
 .nodes-error { color: #8e3e31; background: #fbefeb; }
 
+.admin-toolbar { min-height: 54px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid #dfe4ed; }
+.admin-tabs { height: 54px; display: flex; gap: 18px; }
+.admin-tabs button { position: relative; padding: 0 3px; border: 0; color: #65718a; background: transparent; font: 500 12px "Space Grotesk", sans-serif; cursor: pointer; }
+.admin-tabs button.selected { color: #354bbd; font-weight: 600; }
+.admin-tabs button.selected::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; background: #4c62df; content: ""; }
+.admin-search { width: min(100%, 340px); height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid #dfe4ed; background: #fff; color: #65718a; }
+.admin-search > span { font-size: 18px; }
+.admin-search input { width: 100%; min-width: 0; border: 0; outline: 0; color: #35415b; background: transparent; font: 11px "Space Grotesk", sans-serif; }
+.admin-search input::placeholder { color: #7a869c; }
+.admin-table-wrap { min-height: 120px; }
+.admin-table { min-width: 680px; }
+.admin-table td:first-child { min-width: 175px; }
+.admin-table td:nth-child(2) { white-space: normal; }
+.admin-download-action { width: 32px; height: 32px; border: 1px solid #dfe4ed; color: #4056c8; background: #fff; font-size: 17px; cursor: pointer; }
+.admin-download-action:hover:not(:disabled) { color: #fff; border-color: #4056c8; background: #4056c8; }
+.admin-download-action:disabled { opacity: .45; cursor: not-allowed; }
+.admin-pagination { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #65718a; font-size: 11px; }
+.admin-pagination > div { display: flex; align-items: center; gap: 10px; }
+.admin-pagination .outline-action { min-height: 32px; padding: 0 9px; font-size: 10px; }
+.admin-pagination .outline-action:disabled { opacity: .5; cursor: default; }
+
 .activity-list { margin: 0; padding: 0; border-top: 1px solid #dfe4ed; list-style: none; }
 .activity-list li { min-height: 69px; padding: 12px 4px; display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: 12px; border-bottom: 1px solid #e7eaf0; }
 .activity-list li > div { display: grid; gap: 4px; }
@@ -81,6 +102,11 @@
 .settings-provider .provider-dot { background: #58a37f; }
 .settings-signout { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
 .settings-signout p { margin: 6px 0 0; color: #748097; font-size: 11px; }
+.password-settings-form { max-width: 430px; margin-top: 16px; display: grid; gap: 9px; }
+.password-settings-form label { margin-top: 4px; color: #58647b; font-size: 11px; font-weight: 600; }
+.password-settings-form input { width: 100%; height: 40px; padding: 0 10px; border: 1px solid #dfe4ed; color: #35415b; background: #fff; font: 12px "Space Grotesk", sans-serif; }
+.password-settings-form .solid-action { width: max-content; min-height: 36px; margin-top: 5px; }
+.password-success { margin: 2px 0; color: #326849; font-size: 11px; }
 
 @media (max-width: 850px) {
   .app-view { min-height: 450px; }
@@ -102,7 +128,12 @@
   .dashboard-shortcuts button:last-child { border-bottom: 0; }
   .upload-dropzone { min-height: 260px; padding: 25px 13px; }
   .nodes-table { min-width: 680px; }
+  .admin-toolbar { align-items: stretch; flex-direction: column-reverse; gap: 0; padding-top: 9px; }
+  .admin-search { width: 100%; }
+  .admin-pagination { align-items: flex-start; flex-direction: column; padding: 10px 0; }
+  .admin-pagination > div { width: 100%; justify-content: space-between; }
   .settings-section { padding: 15px 13px; }
+  .password-settings-form .solid-action { width: 100%; justify-content: center; }
   .settings-details > div { grid-template-columns: 82px minmax(0, 1fr); }
   .settings-provider { flex-wrap: wrap; padding: 10px 0; }
   .settings-provider > div { min-width: calc(100% - 30px); }
